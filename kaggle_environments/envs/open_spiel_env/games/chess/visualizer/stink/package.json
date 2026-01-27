@@ -7,7 +7,7 @@
     "dev": "vite",
     "dev-with-replay": "cross-env VITE_REPLAY_FILE=./replays/test-replay.json vite",
     "build": "tsc -b && vite build",
-    "tsc": "tsc -b",
+    "build-with-replay": "tsc -b && cross-env VITE_REPLAY_FILE=test-replay.json vite build && cp ./replays/test-replay.json ./dist/",
     "lint": "eslint .",
     "preview": "vite preview"
   },
