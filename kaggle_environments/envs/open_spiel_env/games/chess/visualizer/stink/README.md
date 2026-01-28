@@ -4,13 +4,13 @@ This is a test version of a visualizer that is built with `react` as the
 frontend framework, and `zustand` for state management. It also uses 
 `react-chessboard`.
 
-Before anything else, take a look here for general info on visualizers in 
+Before doing anything else, take a look here for general info on visualizers in 
 this monorepo.
 
 https://github.com/Stinkstudios/kaggle-environments/blob/logs-playground/VISUALIZER_README.md
 
-This visualizer follows this description, and also follows a general pattern 
-and uses the same shared code as other OpenSpiel games.
+This visualizer follows this description. It also follows the pattern shared 
+code as the other OpenSpiel games.
 
 https://github.com/Stinkstudios/kaggle-environments/tree/logs-playground/kaggle_environments/envs/open_spiel_env
 
@@ -38,12 +38,12 @@ Kaggle.com > Benchmarks > Game Arena > Chess Text Input > Replay
 https://www.kaggle.com/benchmarks/kaggle/chess-text/versions/1?episodeId=72903677
 
 Searching the `kaggle-environments` repo there are few different places where 
-Chess pops up. But it looks like the best match is one of the visualizer code 
+Chess pops up. But it looks like the best match is the chess visualizer found 
 in the `open_spiel_env` folder.
 
 https://github.com/Kaggle/kaggle-environments/tree/chess-image/kaggle_environments/envs/open_spiel/games/chess/visualizer/default
 
-This is a mostly self-contained web app that gets iframed into the Kaggle 
+It's a mostly self-contained web app that gets iframed into the Kaggle 
 website. The web app creates a visualization of a game of chess played between 
 two LLMs.
 
@@ -51,21 +51,20 @@ OpenSpiel is used to simulate the game of chess between the LLMs.
 
 https://github.com/google-deepmind/open_spiel
 
-One important part of the way the app works that is not included in the 
-visualizer folder. Some shared code that is specific to the chess game lives in 
-another part of the monorepo handles pre-processing raw OpenSpiel log files 
-before they are used in the visualizer.
+One important component of how the app works is not included in the visualizer 
+folder. Some shared code specific to chess lives in another part of the 
+monorepo. This handles pre-processing raw OpenSpiel chess log files before they 
+are used in the visualizer.
 
 https://github.com/Kaggle/kaggle-environments/tree/master/web/core/src/transformers/chess
 
-The preprocessing restructures the visualizer and a seperate component 
-in the page alongside it that shows the LLM reasoning at each step.
+The preprocessing restructures data used by the visualizer and the seperate 
+component in the page alongside it that shows the LLM reasoning for each move.
 
-The transformer function run by functions that are shared to many of the 
-different game visualizers. These functions handle receiving the data when it's 
-posted into the visualizer iframe, syncronising play state between the iframe 
-LLM reasoning logs player and also a set of simple playback controls when the 
-player is running in dev mode.
+The transformer is run by functions that handle receiving the data when it's 
+posted into the visualizer iframe from the containing paage, syncronising play 
+state between the iframe LLM reasoning logs player and also rendering a set of 
+simple playback controls when the player is running in dev mode.
 
 https://github.com/Kaggle/kaggle-environments/blob/master/web/core/src/replay-visualizer-factory.ts
 https://github.com/Kaggle/kaggle-environments/blob/master/web/core/src/player.ts
@@ -86,14 +85,15 @@ retaining standard rules, resulting in 960 distinct possible setups.
 
 https://www.houseofstaunton.com/blogs/chess-variants/chess960-a-guide
 
-Makes sense, as changing up the board starting position means the LLM can't 
-rely on on just memorising and repeating historical games, many of which will 
-use the standard chess starting position. Instead it should better test the 
-LLMs reasoning ability more than it's access to a volume of games in memory.
+Changing up the board starting position means the LLM can't rely on on just 
+memorising and repeating historical games, many of which will use the standard 
+chess starting position. It should better test the LLMs reasoning ability more, 
+and rely less on it's access to the volume of historical games it has 
+memorized.
 
-Importantly for us, it means we need to support arbitary board starting states, 
-instead of the visualizer assuming the standard chess starting positions for 
-each piece.
+This means we need to support arbitary board starting states, instead of the 
+visualizer assuming the standard chess starting positions for each piece at the 
+beginning of each game.
 
 The raw OpenSpiel logs include board state and move information in FEN 
 (Forsyth-Edwards Notation) - the standard format for representing chess 
@@ -144,13 +144,13 @@ Fullmove number: `12`
 
 - The move count
 
-The FEN notation is useful as it's not only unambiguous, clearly defining the 
-position of every piece on the board. But it's also commonly used across other 
-chess projects, modules and libraries.
+The FEN notation is useful not only because it's unambiguous, clearly 
+defining the position of every piece on the board. It is also commonly used 
+across the chess world including other chess projects, modules and libraries.
 
 In our example in this folder, we're using the FEN position string to update 
-the `react-chessboard` component directly. And libraries like `chess.js` 
-support using FEN notation too.
+`react-chessboard` directly. And libraries like `chess.js` also support FEN 
+notation.
 
 https://github.com/jhlywa/chess.js
 
@@ -184,7 +184,7 @@ https://github.com/Stinkstudios/kaggle-environments/blob/4b907c7d684a5becac84803
 
 Example of finding interesting events in the poker visualizer:
 
-https://github.com/Stinkstudios/kaggle-environments/blob/4b907c7d684a5becac84803ac912ca3026bc2ba0/web/core/src/transformers/repeated_poker/v2/repeatedPokerTransformerV2.ts#L72
+https://github.com/Stinkstudios/kaggle-environments/blob/4b907c7d684a5becac84803ac912ca3026bc2ba0/web/core/src/transformers/repeated_poker/v2/repeatedPokerTransformerV2.ts#L72C1-L73C1
 
 And where the poker interesting events are hooked into the transformers:
 
