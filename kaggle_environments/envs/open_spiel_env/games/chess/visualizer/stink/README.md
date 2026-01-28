@@ -160,3 +160,36 @@ https://github.com/jhlywa/chess.js
 Watch this video.
 
 https://www.youtube.com/watch?v=vtHfJ6iYyEY
+
+Kaggle have been enhancing how the reasoning logs and game visualizations are 
+displayed by highlighting interesting, important and novel moments.
+
+They described adding extra game steps and adapting animation timings to 
+bring focus to these features of the match.
+
+Reasoning logs playback timing:
+
+https://github.com/Stinkstudios/kaggle-environments/blob/logs-playground/web/core/src/timing.ts
+
+Example of adjusting timings in the poker visualizer:
+
+https://github.com/Stinkstudios/kaggle-environments/blob/4b907c7d684a5becac84803ac912ca3026bc2ba0/web/core/src/transformers/repeated_poker/v2/repeatedPokerTransformerV2.ts#L42C1-L42C40
+
+Although this is defined in the transformer, it actually gets used in the 
+dev mode player (and maybe the full production reasoning logs player too):
+
+https://github.com/Stinkstudios/kaggle-environments/blob/4b907c7d684a5becac84803ac912ca3026bc2ba0/web/core/src/transformers.ts#L121C7-L121C95
+
+https://github.com/Stinkstudios/kaggle-environments/blob/4b907c7d684a5becac84803ac912ca3026bc2ba0/web/core/src/player.ts#L532C1-L533C1
+
+Example of finding interesting events in the poker visualizer:
+
+https://github.com/Stinkstudios/kaggle-environments/blob/4b907c7d684a5becac84803ac912ca3026bc2ba0/web/core/src/transformers/repeated_poker/v2/repeatedPokerTransformerV2.ts#L72
+
+And where the poker interesting events are hooked into the transformers:
+
+https://github.com/Stinkstudios/kaggle-environments/blob/4b907c7d684a5becac84803ac912ca3026bc2ba0/web/core/src/transformers.ts#L138C1-L145C3
+
+But just now, this function isn't being used anywhere in `kaggle-environments` 
+so it's not clear how this turns into additional steps or other change to the 
+episode data that drives the visualizer components.
