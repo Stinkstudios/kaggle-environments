@@ -4,6 +4,16 @@ This is a test version of a visualizer that is built with `react` as the
 frontend framework, and `zustand` for state management. It also uses 
 `react-chessboard`.
 
+Before anything else, take a look here for general info on visualizers in 
+this monorepo.
+
+https://github.com/Stinkstudios/kaggle-environments/blob/logs-playground/VISUALIZER_README.md
+
+This visualizer follows this description, and also follows a general pattern 
+and uses the same shared code as other OpenSpiel games.
+
+https://github.com/Stinkstudios/kaggle-environments/tree/logs-playground/kaggle_environments/envs/open_spiel_env
+
 ## Quick Start
 
 Install requirements.
