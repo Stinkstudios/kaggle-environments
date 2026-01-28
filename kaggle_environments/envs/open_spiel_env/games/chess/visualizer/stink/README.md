@@ -143,3 +143,10 @@ the `react-chessboard` component directly. And libraries like `chess.js`
 support using FEN notation too.
 
 https://github.com/jhlywa/chess.js
+
+
+## Notes on interesting moves/moments
+
+Watch this video.
+
+https://www.youtube.com/watch?v=vtHfJ6iYyEY
