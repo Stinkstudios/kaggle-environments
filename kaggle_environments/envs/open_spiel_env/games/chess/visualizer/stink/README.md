@@ -193,3 +193,31 @@ https://github.com/Stinkstudios/kaggle-environments/blob/4b907c7d684a5becac84803
 But just now, this function isn't being used anywhere in `kaggle-environments` 
 so it's not clear how this turns into additional steps or other change to the 
 episode data that drives the visualizer components.
+
+Key moments and features in any chess game:
+
+
+- Checkmate
+- Check
+- Resignation
+- Draw
+- Escape check
+- Take piece
+- Pawn promotion
+- Castling
+- Stalemate
+- En Passant
+- Double check
+- Underpromotion
+- Attempts at illegal moves
+- Endgame
+- Scarifice
+- Fork
+- Pin
+- Skewer
+- Discovered Attack
+- Openings 
+
+(Queens Gambit, Italian Game, Sicilian Defence, French Defence, Ruy-Lopez, Slav Defence, Caro-Kann Defence, Scotch Game, Kings Indian Defence, Nimzo-Indian Defence) (Open, Semi-Open, Closed) 
+
+https://www.365chess.com/chess-openings/
