@@ -234,8 +234,9 @@ Fianchetto
 AI chess moves have some unique features, coming from the ways that different 
 types of chess AI work.
 
-Different from both humans and tree-search chess AI like AlphaZero, LLMs 
-predict the next move based on millions of previously seen games in PGN format.
+Different from both humans and chess specific AI like Stockfish and AlphaZero, 
+LLMs predict the next move based on millions of previously seen games in PGN 
+format.
 
 https://en.wikipedia.org/wiki/Portable_Game_Notation
 
