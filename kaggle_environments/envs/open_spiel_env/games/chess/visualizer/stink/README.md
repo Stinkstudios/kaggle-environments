@@ -196,7 +196,6 @@ episode data that drives the visualizer components.
 
 Key moments and features in any chess game:
 
-
 - Checkmate
 - Check
 - Resignation
@@ -216,8 +215,66 @@ Key moments and features in any chess game:
 - Pin
 - Skewer
 - Discovered Attack
-- Openings 
+- Openings (Open, Semi-Open, Closed)
+- Theoretical and Tactical Positions
+- Common Positional Structures
 
-(Queens Gambit, Italian Game, Sicilian Defence, French Defence, Ruy-Lopez, Slav Defence, Caro-Kann Defence, Scotch Game, Kings Indian Defence, Nimzo-Indian Defence) (Open, Semi-Open, Closed) 
+Openings: Queens Gambit, Italian Game, Sicilian Defence, French Defence, 
+Ruy-Lopez, Slav Defence, Caro-Kann Defence, Scotch Game, Kings Indian Defence, 
+Nimzo-Indian Defence
 
 https://www.365chess.com/chess-openings/
+
+Tactical: Scholar's Mate, Reti Endgame, Opera Game Mate, Lucena Position, 
+Philidor Position
+
+Common Structures: Isolated Queen's Pawn, Bishops on c5 and b4, Double 
+Fianchetto
+
+AI chess moves have some unique features, coming from the ways that different 
+types of chess AI work.
+
+Different from both humans and tree-search chess AI like AlphaZero, LLMs 
+predict the next move based on millions of previously seen games in PGN format.
+
+https://en.wikipedia.org/wiki/Portable_Game_Notation
+
+Chess specific AI easily outperforms human grandmasters (3500+ ELO). Strong LLM 
+models can reach 1500–1800 ELO, equivalent to an advanced amateur, but fall 
+short of master level.
+
+Key moments in LLM AI chess games:
+
+- Piece hallucinations in LLM thoughts
+- Forgetting captured pieces
+- Illegal moves
+- Unconventional moves
+- ???
+
+## Relative strength of positions
+
+It'd be great to show at a glance which position is strongest.
+
+The most complete version of this would be to use a chess engine to fully 
+calculate the strength of each position.
+
+Easy to drop into a project. Large library and compute heavy. Even larger and 
+with very slow performance if not targetting the more recent browsers and 
+operating systems.
+
+https://github.com/nmrugg/stockfish.js
+
+A lighter and simpler way is to just evaluate the material strength of each 
+position from the FEN, only needing chess.js to quickly access the metrics.
+
+- Sum of the pieces on the board (pawn: 1 point, knight/bishop: 3 points, 
+queen/: 9 points etc.)
+- Positional factors
+  - Piece-Square Tables (Pieces have different values based on their location 
+  e.g., knights in the center are better than in the corner).
+  - Pawn Structure (Penalize doubled, isolated, or backward pawns)
+  - Mobility (Add points for the number of legal moves available to each side)
+- Search Depth (searching several half-moves ahead to see which side has the 
+advantage then)
+
+But is this enough for the more chess savvy audience?
