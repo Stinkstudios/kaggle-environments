@@ -74,6 +74,30 @@ visualizer code.
 
 https://github.com/Kaggle/kaggle-environments/blob/master/kaggle_environments/envs/chess/visualizer/default/src/main.ts
  
+## Replay files
+
+The `dev-with-replay` pnpm script uses a local file instead of waiting for the 
+OpenSpiel data file to be posted into the iframe from the page it's embedded 
+in.
+
+/replays/test-replay.json
+
+We've added a `build-with-replay` script to quickly make deployable versions 
+of the visualiser too.
+
+The data file is a raw dump of data from OpenSpiel, it's in exactly the same 
+format as data that's delivered through the website API to the games arena 
+we pages.
+
+We've also added a shell script to grab more test files from the live game 
+arena pages on the Kaggle website.
+
+`pnpm download-replays`
+
+The data files it downloads vary in size a lot. Many are only a few hundred 
+kb after decompressing, but some are many hundreds of mb in size which is 
+tens of mb even with gzip compression.
+
 ## Notes about the chess logs
 
 It looks the OpenSpiel is simulating Chess960.
@@ -279,3 +303,9 @@ queen/: 9 points etc.)
 advantage then)
 
 But is this enough for the more chess savvy audience?
+
+## Further reading
+
+Someone made an LLM specifically for playing chess.
+
+https://lazy-guy.github.io/blog/chessllama/
