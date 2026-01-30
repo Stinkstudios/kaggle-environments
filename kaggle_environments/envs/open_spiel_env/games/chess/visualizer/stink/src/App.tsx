@@ -1,5 +1,5 @@
-import { createReplayVisualizer, LegacyAdapter, processEpisodeData } from '@kaggle-environments/core';
-import { useEffect, useRef } from 'react';
+import { createReplayVisualizer, LegacyAdapter, processEpisodeData } from '@kaggle-environments/core'
+import { useEffect, useRef } from 'react'
 import { create } from 'zustand'
 import { Chessboard } from 'react-chessboard'
 import './App.css'
@@ -17,22 +17,24 @@ const useChessStore = create<ChessStore>((set) => ({
         .find((el: any) => el.status === "ACTIVE")
         .observation
         .observationString
-    });
+    })
   }
-}));
+}))
 
 function App() {
   const { position, setPosition } = useChessStore()
-  const controlsRef = useRef(null);
+  const controlsRef = useRef(null)
 
   useEffect(() => {
-    const app = controlsRef.current!;
-    const adapter = new LegacyAdapter(setPosition);
+    const app = controlsRef.current!
+    const adapter = new LegacyAdapter(setPosition)
 
     createReplayVisualizer(app, adapter, {
-      transformer: (replay: any) => processEpisodeData(replay, 'no_transformer'),
-    });
-  }, []);
+      transformer: (replay: any) => {
+        return processEpisodeData(replay, 'no_transformer')
+      }
+    })
+  }, [])
 
   return (
     <div className="container">
