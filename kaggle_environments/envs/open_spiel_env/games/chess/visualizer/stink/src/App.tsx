@@ -14,15 +14,15 @@ const useChessStore = create<ChessStore>((set) => ({
   chess: new Chess(),
 
   setState: (data: any) => {
-    const step = data.steps[data.step]
-    const inactive = step.find((el:any) => el.status === "INACTIVE")
-    
-    if (inactive?.action.actionString) {
+    const step = data.steps.at(data.step)
+    const move = step.find((element: any) => element.action.actionString)
+
+    if (move) {
       const history = data.replay.info.stateHistory
-      const index = history.indexOf(inactive.observation.observationString)
-      
-      const chess = new Chess(history[index - 1])
-      chess.move(inactive.action.actionString)
+      const index = history.indexOf(move.observation.observationString)
+
+      const chess = new Chess(history.at(index - 1))
+      chess.move(move.action.actionString)
 
       set({ chess })
     }
