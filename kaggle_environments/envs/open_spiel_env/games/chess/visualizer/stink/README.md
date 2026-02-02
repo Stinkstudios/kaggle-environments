@@ -98,6 +98,17 @@ The data files it downloads vary in size a lot. Many are only a few hundred
 kb after decompressing, but some are many hundreds of mb in size which is 
 tens of mb even with gzip compression.
 
+Note that there is something going on when viewing this in `dev` or a 
+`-with-replay` mode that might or might not also be happening in `production`. 
+
+Each step is triggered twice, it seems to come from how the window listener 
+in combination with the player notifying it's parent work. Disabling either 
+of these leaves the player functional but stops the doubling up.
+
+https://github.com/Kaggle/kaggle-environments/blob/master/web/core/src/player.ts#L75C3-L76C2
+
+https://github.com/Kaggle/kaggle-environments/blob/4a7ccdfd3488475f06c0cd11a2230e7a46e32382/web/core/src/player.ts#L141C5-L142C2
+
 ## Notes about the chess logs
 
 It looks the OpenSpiel is simulating Chess960.

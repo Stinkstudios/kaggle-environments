@@ -4,6 +4,9 @@ import { DARK_SQUARE_COLOR, DEFAULT_NUM_COLS, DEFAULT_NUM_ROWS, LIGHT_SQUARE_COL
 export function renderer(options: any) {
   const { steps, step, parent, playerNames, width = 400, height = 400, viewer } = options;
 
+  console.log("STEP:", options.step)
+  console.log(options.steps[options.step])
+
   let currentBoardElement: HTMLElement | null = null;
   let currentStatusTextElement: HTMLParagraphElement | null = null;
   let currentWinnerTextElement: HTMLElement | null = null;

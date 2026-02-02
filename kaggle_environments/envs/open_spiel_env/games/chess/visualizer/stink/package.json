@@ -8,6 +8,7 @@
     "dev-with-replay": "cross-env VITE_REPLAY_FILE=./replays/test-replay.json vite",
     "build": "tsc -b && vite build",
     "build-with-replay": "tsc -b && cross-env VITE_REPLAY_FILE=test-replay.json vite build && cp ./replays/test-replay.json ./dist/",
+    "serve-build": "cd dist && python -m http.server 8080",
     "download-replays": "cd replays/download && ./download.sh",
     "lint": "eslint .",
     "preview": "vite preview"

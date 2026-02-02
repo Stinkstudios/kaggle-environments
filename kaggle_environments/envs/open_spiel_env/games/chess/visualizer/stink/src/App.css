@@ -40,3 +40,8 @@
 .read-the-docs {
   color: #888;
 }
+
+#moves {
+  margin-top: 1em;
+  height: 3em;
+}

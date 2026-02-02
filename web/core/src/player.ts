@@ -215,7 +215,7 @@ export class ReplayVisualizer<TSteps extends BaseGameStep[] = BaseGameStep[]> {
     }
 
     // 5. Add listener (always)
-    window.addEventListener('message', this.handleMessage);
+    // window.addEventListener('message', this.handleMessage);
   }
 
   private handleKeyDown = (event: KeyboardEvent) => {
