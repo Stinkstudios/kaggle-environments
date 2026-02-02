@@ -1,36 +1,36 @@
 import { createReplayVisualizer, LegacyAdapter } from '@kaggle-environments/core'
 import { useEffect, useRef } from 'react'
 import { create } from 'zustand'
+import { Chess } from 'chess.js'
 import { Chessboard } from 'react-chessboard'
 import './App.css'
 
 interface ChessStore {
-  position: string
-  action: string
-  legalActions: string
+  chess: Chess
   setState: (data: any) => void
 }
 
 const useChessStore = create<ChessStore>((set) => ({
-  position: '',
-  legalActions: '',
-  action: '',
+  chess: new Chess(),
 
   setState: (data: any) => {
     const step = data.steps[data.step]
-    const active = step.find((el:any) => el.status === "ACTIVE")
     const inactive = step.find((el:any) => el.status === "INACTIVE")
+    
+    if (inactive?.action.actionString) {
+      const history = data.replay.info.stateHistory
+      const index = history.indexOf(inactive.observation.observationString)
+      
+      const chess = new Chess(history[index - 1])
+      chess.move(inactive.action.actionString)
 
-    set({
-      position: active.observation.observationString,
-      legalActions: active.observation.legalActionStrings?.join(" "),
-      action: inactive?.action.actionString,
-    })
+      set({ chess })
+    }
   },
 }))
 
 function App() {
-  const { position, action, legalActions, setState } = useChessStore()
+  const { chess, setState } = useChessStore()
   const controlsRef = useRef(null)
 
   useEffect(() => {
@@ -42,9 +42,11 @@ function App() {
 
   return (
     <div className="container">
-      <Chessboard options={{ position }} />
+      <Chessboard options={{ position: chess.fen() }} />
       <div id="controls" ref={controlsRef} />
-      <div id="moves"><b>{action}</b> {legalActions}</div>
+      <div id="moves">
+        <b>{chess.history()[0]}</b> {chess.moves().join(" ")}
+      </div>
     </div>
   )
 }
