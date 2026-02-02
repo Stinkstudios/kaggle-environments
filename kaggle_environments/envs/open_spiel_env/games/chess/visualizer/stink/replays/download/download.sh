@@ -25,7 +25,8 @@ for EPISODE_ID in $EPISODE_LIST; do
   EPISODE_NAME=$(cat $EPISODE_ID.json | jq --raw-output '.info.TeamNames | join("-") | gsub(" "; "")')
 
   # Format the json to read it
-  cat $EPISODE_ID.json | python -m json.tool > $EPISODE_ID-$EPISODE_NAME.json
+  # cat $EPISODE_ID.json | python -m json.tool > $EPISODE_ID-$EPISODE_NAME.json
+  cat $EPISODE_ID.json | jq "." > $EPISODE_ID-$EPISODE_NAME.json
 
   # Gzip the original file, check how big was it to download in a browser
   gzip $EPISODE_ID.json
