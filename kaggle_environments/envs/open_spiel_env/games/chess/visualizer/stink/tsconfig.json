@@ -2,8 +2,8 @@
   "extends": "../../../../../../../web/tsconfig.base.json",
   "compilerOptions": {
     "allowImportingTsExtensions": true,
-    "jsxImportSource": null,
+    "jsxImportSource": "react",
     "jsx": "react-jsx",
   },
-  "include": ["src"]
+  "include": ["src"],
 }
