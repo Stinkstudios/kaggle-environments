@@ -3,7 +3,7 @@
   "compilerOptions": {
     "allowImportingTsExtensions": true,
     "jsxImportSource": "react",
-    "jsx": "react-jsx",
+    "jsx": "react-jsx"
   },
-  "include": ["src"],
+  "include": ["src"]
 }
