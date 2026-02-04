@@ -2,7 +2,7 @@
 
 This is a test version of a visualizer that is built with `react` as the 
 frontend framework, and `zustand` for state management. It also uses 
-`react-chessboard`.
+`react-chessboard` and `chess.js`.
 
 Before doing anything else, take a look here for general info on visualizers in 
 this monorepo.
@@ -20,14 +20,31 @@ Install requirements.
 
 `pnpm install`
 
+Make a copy of `.env.example` to `.env` for the default environment 
+configuration for development.
+
 Run for dev using a local data file for the chess match.
 
-`pnpm dev-with-replay`
+~~`pnpm dev-with-replay`~~
+
+`pnpm dev`
+
+_Update: Add an .env file to set the replay location._
 
 You can also build a deployable version that uses the data file for sharing and
 internal review.
 
-`pnpm build-with-replay`
+~~`pnpm build-with-replay`~~
+
+`pnpm build`
+
+_Update: Add an .env file to set the replay location._
+
+If you want to download some additional replay files there's a script for that. 
+
+`pnpm download-replays`
+
+This will drop a random mix of replays into `replays/download`
 
 ## Notes about the visualizer
 

@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build && node --env-file=.env ./scripts/build.js",
     "preview": "vite preview",
-    "download-replays": "cd replays && ../scripts/download.sh"
+    "download-replays": "node --env-file=.env ./scripts/download.js"
   },
   "devDependencies": {
     "@types/react": "^19.2.10",
