@@ -1,4 +1,4 @@
-name: Build Chess v2
+name: Chess v2
 
 on:
   pull_request:
@@ -6,8 +6,8 @@ on:
       - feature/chess-v2
 
 jobs:
-  build:
-    name: Build Chess v2
+  test-and-build:
+    name: Test + Build
     runs-on: ubuntu-latest
 
     defaults:
