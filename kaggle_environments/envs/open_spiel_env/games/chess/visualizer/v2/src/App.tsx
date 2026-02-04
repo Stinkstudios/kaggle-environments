@@ -1,31 +1,36 @@
-import { createReplayVisualizer, LegacyAdapter } from '@kaggle-environments/core';
 import { useEffect, useRef } from 'react';
 import { create } from 'zustand';
 import { Chess } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
+import {
+  createReplayVisualizer,
+  LegacyAdapter,
+  processEpisodeData,
+  ReplayData,
+  ChessGameStep,
+  ChessReplayStep,
+  LegacyRendererOptions,
+} from '@kaggle-environments/core';
 import './App.css';
 
 interface ChessStore {
   chess: Chess;
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  setState: (data: any) => void;
+  setState: (data: LegacyRendererOptions<ChessGameStep[]>) => void;
 }
 
 const useChessStore = create<ChessStore>((set) => ({
   chess: new Chess(),
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  setState: (data: any) => {
+  setState: (data: LegacyRendererOptions<ChessGameStep[]>) => {
     const step = data.steps.at(data.step);
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    const move = step.find((element: any) => element.action.actionString);
+    const move = step!.entries.find((element: ChessReplayStep) => element.action!.actionString);
 
     if (move) {
-      const history = data.replay.info.stateHistory;
+      const history = data.replay.info!.stateHistory;
       const index = history.indexOf(move.observation.observationString);
 
       const chess = new Chess(history.at(index - 1));
-      chess.move(move.action.actionString);
+      chess.move(move.action!.actionString!);
 
       set({ chess });
     }
@@ -38,9 +43,10 @@ function App() {
 
   useEffect(() => {
     const app = controlsRef.current!;
-    const adapter = new LegacyAdapter(setState);
+    const adapter = new LegacyAdapter<ChessGameStep[]>(setState);
+    const transformer = (replay: ReplayData) => processEpisodeData(replay, 'open_spiel_chess_v2');
 
-    createReplayVisualizer(app, adapter);
+    createReplayVisualizer(app, adapter, { transformer });
   }, [setState]);
 
   return (

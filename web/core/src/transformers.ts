@@ -1,5 +1,6 @@
 import { defaultGetStepRenderTime, generateDefaultDelayDistribution, generateEaseInDelayDistribution } from './timing';
 import { chessTransformer, getChessStepDescription, getChessStepLabel } from './transformers/chess/chessTransformer';
+import { chessTransformerV2,  } from './transformers/chess_v2/chessTransformerV2';
 import { ChessStep } from './transformers/chess/chessReplayTypes';
 import {
   connectFourTransformer,
@@ -65,6 +66,9 @@ export const processEpisodeData = (environment: ReplayData, gameName: string): R
       break;
     case 'open_spiel_chess':
       transformedSteps = chessTransformer(environment);
+      break;
+    case 'open_spiel_chess_v2':
+      transformedSteps = chessTransformerV2(environment);
       break;
     case 'open_spiel_connect_four':
       transformedSteps = connectFourTransformer(environment);

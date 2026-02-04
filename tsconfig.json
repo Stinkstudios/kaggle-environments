@@ -15,5 +15,5 @@
     "noImplicitReturns": true,
     "skipLibCheck": true
   },
-  "include": ["kaggle_environments/envs/*/visualizer/src"]
+  "include": ["kaggle_environments/envs/**/visualizer/*/src"]
 }
