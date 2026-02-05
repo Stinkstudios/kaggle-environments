@@ -50,12 +50,14 @@ function App() {
     createReplayVisualizer(app, adapter, { transformer });
   }, [setState]);
 
+  const move = chess.history({ verbose: true })[0];
+
   return (
     <div className="container">
       <Chessboard options={{ position: chess.fen() }} />
       <div id="controls" ref={controlsRef} />
       <div id="moves">
-        <b>{chess.history()[0]}</b> {chess.moves().join(' ')}
+        {move ? `${move.piece} ${move.from} → ${move.to}`: `Loading...`}
       </div>
     </div>
   );
