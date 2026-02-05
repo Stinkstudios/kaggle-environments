@@ -23,14 +23,17 @@ const useChessStore = create<ChessStore>((set) => ({
 
   setState: (data: LegacyRendererOptions<ChessStep[]>) => {
     const step = data.steps.at(data.step)!;
-    const move = step.players.find((element: ChessPlayer) => element.isTurn);
+    const player = step.players.find((element: ChessPlayer) => element.isTurn);
 
-    if (move) {
+    if (player) {
       const history = data.replay.info!.stateHistory;
       const chess = new Chess(history.at(data.step));
-      chess.move(move.actionDisplayText!);
+      const move = chess.move(player.actionDisplayText!);
 
       set({ chess });
+
+      console.log(player.thoughts);
+      console.log(`${player.name}: ${move.piece} ${move.from} -> ${move.to}`)
     }
   },
 }));
