@@ -7,6 +7,7 @@ For detailed how-to guides, see the skills in `.agents/skills/`:
 - **create-harness** -- step-by-step guide for writing an LLM harness (connecting a language model to a game)
 - **review-harness** -- methodology for auditing an existing LLM harness for gameplay-impacting bugs
 - **create-visualizer** -- step-by-step guide for building a web visualizer for any game (regular or OpenSpiel)
+- **new-visualizer** -- lightweight/quick variant of create-visualizer for prototyping a renderer
 - **onboard-open-spiel-game** -- step-by-step guide for adding an OpenSpiel game (Python backend)
 
 ## Project Overview
