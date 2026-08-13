@@ -7,6 +7,7 @@
   --color-white: #F1F1F1;
   --color-grey: #DCDCDC;
   --color-dark-grey: #313131;
+  --color-highlight-blue: #BDEEFF;
 
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -31,4 +32,25 @@
   @import 'tailwindcss/preflight.css';
   @import 'tailwindcss/utilities.css';
   -webkit-tap-highlight-color: transparent;
+}
+
+#kaggle-design-system :is(.grid-pile) {
+  display: grid;
+}
+
+#kaggle-design-system :is(.grid-pile > *, .grid-pile::before, .grid-pile::after) {
+  grid-area: 1 / 1;
+}
+
+.squiggle-border {
+  background-image:
+    url("./images/squiggle-solid.png"), url("./images/squiggle-solid.png"),
+    url("./images/squiggle-v.png"), url("./images/squiggle-v.png");
+  background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  background-position: top, bottom, left, right;
+  background-size:
+    5rem 2px,
+    5rem 2px,
+    2px 5rem,
+    2px 5rem;
 }
