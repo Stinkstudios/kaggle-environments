@@ -3,7 +3,7 @@
 @import "@kaggle-environments/design-system-layouts";
 
 /* Tailwind must scan the workspace component sources for utility classes. */
-@source "../../../web/design-system/packages/components/src";
+@source "__COMPONENTS_SRC_FROM_SRC_DIR__";
 
 html,
 body,

@@ -2,7 +2,7 @@
 
 Building a game visualizer starts with a **brief**, filled in steps. Each step has two paths: the client **supplies an artifact** (highest authority) or the system **defaults** kick in. The agent never invents a third path. Ambiguity is removed step by step *before* code is written; the finished brief is the build contract.
 
-Work through the steps in order. Record the answer to every step in `apps/<game>/BRIEF.md` so the build is reproducible and reviewable.
+Work through the steps in order. Record the answer to every step in `<game-dir>/visualizer/<version>/BRIEF.md` so the build is reproducible and reviewable.
 
 ## Step 1 — Game identity
 
