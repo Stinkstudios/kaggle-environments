@@ -8,5 +8,10 @@
     "rootDir": "./src",
     "jsx": "react-jsx"
   },
-  "include": ["src"]
+  "include": ["src"],
+  // Story files are dev-only tooling, not part of the published package —
+  // Storybook type-checks/transforms them itself (esbuild, no tsc), and
+  // @storybook/react-vite's package exports don't resolve under this
+  // config's moduleResolution, which would otherwise break `pnpm build`.
+  "exclude": ["src/**/*.stories.tsx"]
 }

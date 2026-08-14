@@ -41,16 +41,23 @@ nested one level deeper than originally planned:
   components + their own assets (logos, avatar art).
 - `tools` (`@kaggle-environments/design-system-tools`) — the `cn`/agent-brand
   helpers `components` depends on.
-- `preview` (`@kaggle-environments/design-system-preview`, private, unpublished)
-  — the component gallery Vite app. Depends on both `components` and
-  `tokens`; nothing depends on `preview`, so the graph stays acyclic. Owns
-  no design assets of its own anymore — everything stylistic came from
-  `tokens`.
+The component gallery is Storybook now, not a hand-rolled preview app —
+`web/design-system/packages/components/.storybook/`
+(`pnpm --filter @kaggle-environments/design-system-components storybook`).
+A `preview` package (`@kaggle-environments/design-system-preview`) used to
+fill this role — a single-page app manually wiring up each component with
+hardcoded demo props, no controls, no accessibility checks, and a hand-added
+`@container` div to test `WithPopover`'s responsive resize. Storybook covers
+all of that natively (`addon-a11y` reports live pass/fail per story; a
+`containerWidth` Control replaces the hardcoded div) and adds autodocs
+generated straight from each component's TypeScript props, so `preview` was
+deleted rather than kept alongside a superset of its own functionality.
 
 There's no umbrella re-exporting any of this and no separately compiled
 stylesheet — `components` gets its styling by whoever imports `tokens.css`
-alongside it (that's `preview` today). This is intentionally the shape a
-future visualizer should follow too: import both
+alongside it (Storybook's `.storybook/preview.tsx` does this via a global
+decorator). This is intentionally the shape a future visualizer should
+follow too: import both
 `@kaggle-environments/design-system-components` and
 `@kaggle-environments/design-system-tokens/tokens.css` in its own entry
 point, and its own Vite build bundles everything (components' utility
