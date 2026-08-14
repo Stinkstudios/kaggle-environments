@@ -1,6 +1,6 @@
 # Skill: layout
 
-Layout is an **enum, not a canvas**. Pick one named variant from `@gamecraft/layouts`, put content in its semantic slots, done. You never write `grid-template-areas`, never position absolutely, never invent breakpoints.
+Layout is an **enum, not a canvas**. Pick one named variant from `@kaggle-environments/design-system-layouts`, put content in its semantic slots, done. You never write `grid-template-areas`, never position absolutely, never invent breakpoints.
 
 ## Picking a variant
 

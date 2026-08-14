@@ -1,0 +1,21 @@
+{
+  "name": "@kaggle-environments/design-system-layout-compiler",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "gc-layout": "./src/cli.mjs"
+  },
+  "exports": {
+    ".": "./src/compile.mjs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "example": "node src/cli.mjs --name custom-example --desktop fixtures/example-desktop.svg --mobile fixtures/example-mobile.svg"
+  },
+  "devDependencies": {
+    "vite": "^7.0.0"
+  }
+}

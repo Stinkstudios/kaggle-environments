@@ -1,0 +1,17 @@
+<svg width="390" height="844" viewBox="0 0 390 844" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="hud">
+<rect x="0" y="0" width="390" height="60" fill="#EFEFEF"/>
+</g>
+<g id="opponent">
+<rect x="0" y="60" width="390" height="120" fill="#D9D9D9"/>
+</g>
+<g id="board">
+<rect x="0" y="182" width="390" height="420" fill="#C4C4C4"/>
+</g>
+<g id="player">
+<rect x="0" y="602" width="390" height="122" fill="#D9D9D9"/>
+</g>
+<g id="controls">
+<rect x="0" y="724" width="390" height="120" fill="#EFEFEF"/>
+</g>
+</svg>

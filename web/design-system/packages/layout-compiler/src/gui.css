@@ -1,0 +1,242 @@
+/* Dev-tool GUI. Standalone: mirrors gamecraft token values without requiring Tailwind. */
+:root {
+  --bg: #0e1116;
+  --surface: #171b22;
+  --surface-2: #1f242e;
+  --edge: #353c4a;
+  --fg: #eef1f6;
+  --fg-muted: #9aa3b2;
+  --accent: #20beff;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 15px/1.5 "Inter", system-ui, sans-serif;
+  padding: 1.5rem;
+}
+
+header {
+  max-width: 72rem;
+  margin: 0 auto 1.5rem;
+}
+h1 {
+  font-size: 1.4rem;
+  margin: 0 0 0.25rem;
+}
+header p {
+  color: var(--fg-muted);
+  margin: 0;
+  max-width: 60ch;
+}
+code {
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 0.85em;
+  color: var(--accent);
+}
+
+main {
+  max-width: 72rem;
+  margin: 0 auto;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.field label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--fg-muted);
+  margin-bottom: 0.35rem;
+}
+input[type="text"],
+#name,
+textarea {
+  width: 100%;
+  background: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 0.8rem;
+}
+textarea {
+  height: 9rem;
+  resize: vertical;
+}
+input[type="file"] {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+}
+.field.dragover textarea {
+  border-color: var(--accent);
+}
+
+.inputs {
+  display: grid;
+  gap: 1rem;
+}
+#name {
+  max-width: 20rem;
+}
+.svg-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.output {
+  display: grid;
+  gap: 1.5rem;
+}
+.panel h2 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+  margin: 0 0 0.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+.hint {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+#copy {
+  background: var(--surface-2);
+  border: 1px solid var(--edge);
+  color: var(--fg);
+  border-radius: 6px;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.6rem;
+  cursor: pointer;
+}
+#copy:hover {
+  border-color: var(--accent);
+}
+
+#descriptions {
+  display: grid;
+  gap: 0.5rem;
+}
+.desc-row {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  align-items: center;
+  gap: 0.75rem;
+}
+.desc-row code {
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+.desc-row input {
+  background: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
+}
+.desc-row input:placeholder-shown {
+  border-color: #fbbf2466;
+}
+
+#drawings {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+#drawings figure {
+  margin: 0;
+}
+#drawings figcaption {
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+  margin-bottom: 0.35rem;
+}
+#drawings svg {
+  max-width: 320px;
+  height: auto;
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+pre {
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  margin: 0;
+}
+#messages {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  display: grid;
+  gap: 0.25rem;
+}
+.msg-error {
+  color: #f87171;
+}
+.msg-warning {
+  color: #fbbf24;
+}
+
+/* Live preview: resizable container + minimal .gc-layout base (mirror of @kaggle-environments/design-system-layouts). */
+#preview-box {
+  resize: both;
+  overflow: hidden;
+  width: min(100%, 900px);
+  height: 560px;
+  min-width: 280px;
+  min-height: 220px;
+  border: 1px dashed var(--edge);
+  border-radius: 8px;
+}
+.gc-layout {
+  container-type: size;
+  container-name: gc-root;
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+}
+.gc-layout > .gc-grid {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  gap: 1rem;
+  padding: 1rem;
+}
+@container gc-root (height < 520px) {
+  .gc-layout > .gc-grid {
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+}
+.slot {
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  background: var(--surface-2);
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  color: var(--fg-muted);
+  min-width: 0;
+  min-height: 0;
+}
+.slot-board {
+  background: #232936;
+  color: var(--fg);
+  border-color: var(--accent);
+}

@@ -1,0 +1,11 @@
+<svg width="375" height="600" viewBox="0 0 375 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g id="Frame 3" clip-path="url(#clip0_282_234)">
+    <rect width="375" height="600" fill="white"/>
+    <rect id="player_one" x="64" width="311" height="64" fill="#D9D9D9"/>
+    <rect id="player_one_logo" width="64" height="64" fill="#BABABA"/>
+    <rect id="player_two" x="64" y="64" width="311" height="64" fill="#D9D9D9"/>
+    <rect id="player_two_logo" y="64" width="64" height="64" fill="#BABABA"/>
+    <rect id="board" width="375" height="472" transform="matrix(1 0 0 -1 0 600)" fill="#D9D9D9"/>
+  </g>
+
+</svg>

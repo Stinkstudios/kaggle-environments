@@ -1,6 +1,6 @@
 # Skill: theming
 
-One design language, small per-game accent surface. Consistency across games beats per-game personality. Stack is Tailwind v4: tokens live in `@gamecraft/tokens` as `@theme` values; you style with the utilities they generate.
+One design language, small per-game accent surface. Consistency across games beats per-game personality. Stack is Tailwind v4: tokens live in `@kaggle-environments/design-system-tokens` as `@theme` values; you style with the utilities they generate.
 
 ## May override (per game, scoped to `.gc-layout`)
 

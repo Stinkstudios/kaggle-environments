@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gc-layout — Figma SVG → grid variant</title>
+    <link rel="stylesheet" href="/src/gui.css" />
+  </head>
+  <body>
+    <header>
+      <h1>gc-layout</h1>
+      <p>
+        Figma SVG of named rectangles in → <code>grid-template-areas</code> variant out. Drop or
+        paste an export per breakpoint; rectangles snap to shared grid lines (2% tolerance). Slot
+        names: <code>board · player · opponent · hud · controls</code>.
+      </p>
+    </header>
+
+    <main>
+      <section class="inputs">
+        <div class="field">
+          <label for="name">Variant name</label>
+          <input id="name" value="custom-example" spellcheck="false" />
+        </div>
+        <div class="svg-inputs">
+          <div class="field" data-breakpoint="desktop">
+            <label for="svg-desktop">Desktop SVG (required)</label>
+            <textarea id="svg-desktop" spellcheck="false"></textarea>
+            <input type="file" id="file-desktop" accept=".svg" />
+          </div>
+          <div class="field" data-breakpoint="mobile">
+            <label for="svg-mobile">Mobile SVG (required)</label>
+            <textarea id="svg-mobile" spellcheck="false"></textarea>
+            <input type="file" id="file-mobile" accept=".svg" />
+          </div>
+          <div class="field" data-breakpoint="dense">
+            <label for="svg-dense">Dense SVG (optional, ≤500px strip)</label>
+            <textarea id="svg-dense" spellcheck="false" placeholder="Paste or drop the dense frame export, or leave empty"></textarea>
+            <input type="file" id="file-dense" accept=".svg" />
+          </div>
+        </div>
+      </section>
+
+      <section class="output">
+        <div class="panel">
+          <h2>Drawing</h2>
+          <div id="drawings"></div>
+        </div>
+        <div class="panel">
+          <h2>Slot descriptions <span class="hint">one line per drawn id — what lives in that region?</span></h2>
+          <div id="descriptions"></div>
+        </div>
+        <div class="panel">
+          <h2>Generated CSS <button id="copy" type="button">copy</button></h2>
+          <pre id="css"></pre>
+          <div id="messages"></div>
+        </div>
+        <div class="panel">
+          <h2>Layout spec (handoff markdown) <button id="copy-spec" type="button">copy</button></h2>
+          <pre id="spec"></pre>
+        </div>
+        <div class="panel">
+          <h2>Live preview <span class="hint">drag the corner — container queries switch the grid (narrow &lt; 640px wide, dense &lt; 520px tall)</span></h2>
+          <div id="preview-box">
+            <div class="gc-layout" data-layout="custom-preview">
+              <div class="gc-grid" id="preview-grid"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/gui.mjs"></script>
+  </body>
+</html>

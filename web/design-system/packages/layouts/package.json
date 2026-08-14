@@ -1,0 +1,10 @@
+{
+  "name": "@kaggle-environments/design-system-layouts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./layouts.css",
+    "./layouts.css": "./layouts.css"
+  }
+}

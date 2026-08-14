@@ -1,0 +1,207 @@
+/*
+ * @kaggle-environments/design-system-layouts — the ONLY allowed page structures for a game visualizer.
+ * An AI picks ONE variant by name and places content into its semantic slots.
+ * It never writes its own grid-template-areas. See skills/layout.md.
+ *
+ * Usage:
+ *   <div class="gc-layout" data-layout="table">
+ *     <div class="gc-slot-opponent">…</div>
+ *     <div class="gc-slot-board">…</div>
+ *     <div class="gc-slot-player">…</div>
+ *     <div class="gc-slot-hud">…</div>
+ *     <div class="gc-slot-controls">…</div>
+ *   </div>
+ *
+ * Slots (use only the ones a variant defines):
+ *   board     — the play area (board, table, grid)
+ *   player    — "you" / player A badge + hand
+ *   opponent  — player B badge + hand (or list of others)
+ *   hud       — turn indicator, score, move counter, info button
+ *   controls  — action buttons (hit/stand, resign, replay scrubber)
+ *
+ * Every variant responds to its container, not the viewport:
+ *   wide   — default
+ *   narrow — container width < 640px
+ *   dense  — container height < 520px (Kaggle homepage 500px strip)
+ * Dense wins when both apply.
+ */
+
+.gc-layout {
+  container-type: size;
+  container-name: gc-root;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+}
+
+.gc-layout > .gc-grid {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  gap: 1rem;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.gc-slot-board { grid-area: board; min-width: 0; min-height: 0; }
+.gc-slot-player { grid-area: player; min-width: 0; }
+.gc-slot-opponent { grid-area: opponent; min-width: 0; }
+.gc-slot-hud { grid-area: hud; min-width: 0; }
+.gc-slot-controls { grid-area: controls; min-width: 0; }
+
+/* =====================================================================
+ * 1. versus-vertical — opponent top, board center, player bottom.
+ *    For: chess, go, checkers, any 2-player board game.
+ * ===================================================================== */
+[data-layout="versus-vertical"] > .gc-grid {
+  grid-template:
+    "opponent hud" auto
+    "board hud" 1fr
+    "player hud" auto
+    "controls hud" auto
+    / 1fr minmax(180px, 260px);
+}
+
+@container gc-root (width < 640px) {
+  [data-layout="versus-vertical"] > .gc-grid {
+    grid-template:
+      "opponent" auto
+      "board" 1fr
+      "player" auto
+      "hud" auto
+      "controls" auto
+      / 1fr;
+  }
+}
+
+@container gc-root (height < 520px) {
+  [data-layout="versus-vertical"] > .gc-grid {
+    gap: 0.5rem;
+    padding: 0.5rem;
+    grid-template:
+      "opponent board hud" auto
+      "player board hud" 1fr
+      "controls board hud" auto
+      / minmax(140px, auto) 1fr minmax(140px, 200px);
+  }
+}
+
+/* =====================================================================
+ * 2. table — shared table center, opponent hand top, your hand bottom.
+ *    For: blackjack, most 2-seat card games.
+ * ===================================================================== */
+[data-layout="table"] > .gc-grid {
+  grid-template:
+    "opponent opponent" auto
+    "board hud" 1fr
+    "player player" auto
+    "controls controls" auto
+    / 1fr minmax(180px, 260px);
+}
+
+@container gc-root (width < 640px) {
+  [data-layout="table"] > .gc-grid {
+    grid-template:
+      "hud" auto
+      "opponent" auto
+      "board" 1fr
+      "player" auto
+      "controls" auto
+      / 1fr;
+  }
+}
+
+@container gc-root (height < 520px) {
+  [data-layout="table"] > .gc-grid {
+    gap: 0.5rem;
+    padding: 0.5rem;
+    grid-template:
+      "opponent board hud" 1fr
+      "player board hud" 1fr
+      "controls board hud" auto
+      / minmax(160px, auto) 1fr minmax(140px, 200px);
+  }
+}
+
+/* =====================================================================
+ * 3. side-panel — board fills left, everything else in right panel.
+ *    For: wide embeds where the board is the hero (go on desktop).
+ * ===================================================================== */
+[data-layout="side-panel"] > .gc-grid {
+  grid-template:
+    "board opponent" auto
+    "board hud" 1fr
+    "board player" auto
+    "board controls" auto
+    / 1fr minmax(220px, 320px);
+}
+
+@container gc-root (width < 640px) {
+  [data-layout="side-panel"] > .gc-grid {
+    grid-template:
+      "opponent" auto
+      "board" 1fr
+      "player" auto
+      "hud" auto
+      "controls" auto
+      / 1fr;
+  }
+}
+
+@container gc-root (height < 520px) {
+  [data-layout="side-panel"] > .gc-grid {
+    gap: 0.5rem;
+    padding: 0.5rem;
+    grid-template:
+      "board opponent hud" auto
+      "board player hud" 1fr
+      "board controls hud" auto
+      / 1fr minmax(150px, auto) minmax(140px, 200px);
+  }
+}
+
+/* =====================================================================
+ * 4. arena — many players ringed around a central board.
+ *    For: poker, 3+ seat games. Opponent slot holds a row of badges.
+ * ===================================================================== */
+[data-layout="arena"] > .gc-grid {
+  grid-template:
+    "opponent opponent opponent" auto
+    "hud board controls" 1fr
+    "player player player" auto
+    / minmax(160px, auto) 1fr minmax(160px, auto);
+}
+
+@container gc-root (width < 640px) {
+  [data-layout="arena"] > .gc-grid {
+    grid-template:
+      "opponent" auto
+      "board" 1fr
+      "player" auto
+      "hud" auto
+      "controls" auto
+      / 1fr;
+  }
+}
+
+@container gc-root (height < 520px) {
+  [data-layout="arena"] > .gc-grid {
+    gap: 0.5rem;
+    padding: 0.5rem;
+    grid-template:
+      "opponent board hud" auto
+      "player board hud" 1fr
+      "controls board hud" auto
+      / minmax(160px, auto) 1fr minmax(140px, 200px);
+  }
+}
+
+/*
+ * Named but not yet implemented (add when a game needs them):
+ * 5. versus-corners — badges overlaid top-left/bottom-right of a full-bleed board.
+ * 6. duel-horizontal — two mirrored halves side by side (simultaneous-play games).
+ * 7. solo — single player + board, no opponent slot (puzzles).
+ * An AI must NOT invent these; request them from a human.
+ */

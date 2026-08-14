@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@import "@kaggle-environments/design-system-tokens/tokens.css";
+@import "@kaggle-environments/design-system-layouts";
+
+/* Tailwind must scan the workspace component sources for utility classes. */
+@source "../../../web/design-system/packages/components/src";
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+}
