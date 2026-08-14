@@ -86,7 +86,7 @@ the new-visualizer flow" below for what's fixed vs. what still isn't.
 | Doc | Describes | Actually exists |
 |---|---|---|
 | `README.md` | ~~Monorepo split: `packages/tokens`, `packages/layouts`, `packages/components`, `packages/assets`, `packages/layout-compiler`, `packages/create-app`~~ — **fixed**: now points at `web/design-system` and flags the layout system, layout compiler, asset manifest, and app scaffolder as not-yet-built | Matches reality. |
-| `visualizer-brief.md` | `apps/<game>/BRIEF.md` intake; Figma→CSS via `gc-layout` compiler (`@kaggle-environments/design-system-layout-compiler`) | `gc-layout` (the compiler) genuinely exists and works (`web/design-system/packages/layout-compiler`), package name now correct in this doc — but no `apps/` dir (games live at `kaggle_environments/envs/<game>/visualizer/default/`, and `apps/*` isn't in `pnpm-workspace.yaml`), no `BRIEF.md` convention anywhere else in the repo. See "Ran the new-visualizer flow" below. |
+| `visualizer-brief.md` | `<game-dir>/visualizer/<version>/BRIEF.md` intake; Figma→CSS via `gc-layout` compiler (`@kaggle-environments/design-system-layout-compiler`) | `gc-layout` (the compiler) genuinely exists and works (`web/design-system/packages/layout-compiler`); `gc-new-app` genuinely writes `BRIEF.md` at that exact path now — both package name and location in this doc are correct. See "Ran the new-visualizer flow" below. |
 | `layout.md` | Named layout enum (`table`, `versus-vertical`, `arena`, `side-panel`) via `.gc-layout`/`.gc-grid`/`.gc-slot-*` classes from `@kaggle-environments/design-system-layouts` | **Now real** — `web/design-system/packages/layouts` (`@kaggle-environments/design-system-layouts`) defines exactly these 4 variants with wide/narrow/dense container-query grids, matching this doc's table, and the package name in this doc is correct. Only remaining gap: `layouts.css` references `var(--color-bg)`/`var(--color-fg)`, which don't exist in `tokens.css` (only `--color-black/white/grey/dark-grey/highlight-blue` do) — every layout renders unstyled until that's fixed. |
 | `component-selection.md` | 10 components incl. `PlayingCard`, `CardHand`, `BoardGrid`, `Stone`, `ScoreValue`, `TurnIndicator`, `InfoPopup`, `Modal`, `GameAnnouncer` | The roster shrank further, not grown: `Button`, `Badge`, and `Card` were removed (deleted from disk, mid-rework — the user's own in-progress change) since the previous pass of this doc. Only `PlayerBadge` and `SvgSprite` exist now (`web/design-system/packages/components/src/components/index.ts`); the doc has been rewritten to say so plainly rather than list a stale roster as if available. Everything else — including `Button` once it comes back, since it may look different — is a flagged gap, not an assumption. |
 | `assets.md` | `packages/assets/cards/` + generated `manifest.json` + `cardImage()` helper, 40 card faces | `web/design-system/packages/components/src/assets/` has only player badge/reflection webp + one icon sprite. No cards, no manifest, no helper (path is a rename per architecture note; the manifest/helper/card files themselves are still missing). |
@@ -127,39 +127,62 @@ the actual output both times):
   `packages/components/src/assets/`) — dropped from the scaffolded
   `package.json`'s dependencies rather than renamed to a still-nonexistent
   package.
-- The scaffolded app's own name changed from `@gamecraft/<name>` to
-  `@kaggle-environments/<name>` (not `-design-system-<name>` — it's a game
-  app, not a design-system package; matches how every existing per-game
-  visualizer is already named, e.g.
-  `@kaggle-environments/open-spiel-nine-mens-morris-visualizer`).
-- The two wrong relative paths are fixed: `game.css`'s
-  `@source "../../../packages/components/src"` and `tsconfig.json`'s
-  `"../../packages/components/src"` both now correctly include the
-  `web/design-system/` segment.
+- **`gc-new-app` now targets the real convention, not `apps/<name>/`.**
+  `--game-dir <existing game dir>` replaces `--name`/`--dir` — a visualizer
+  always attaches to a game that's already in `kaggle_environments/envs/`,
+  so scaffolding a new top-level app was never the right shape. Writes into
+  `<game-dir>/visualizer/<version>/`, the same `visualizer/` root every real
+  visualizer already uses, and never touches the hand-built `default/`
+  variant sitting alongside it. `pnpm-workspace.yaml` needed no change —
+  the existing `kaggle_environments/envs/*/visualizer/*` and
+  `.../open_spiel_env/games/*/visualizer/*` globs already match any
+  subfolder name, `default` or otherwise.
+- **New `--version` flag, defaulting to auto-increment.** Scans
+  `<game-dir>/visualizer/` for existing `v1`, `v2`, … and picks the next one
+  (`v1` if none exist), so repeat test scaffolds — the normal way to
+  exercise this flow — don't clobber each other or `default/`. Pass
+  `--version` explicitly (with `--force`) to target a specific one.
+- **Found and fixed a real naming collision this surfaced.** The scaffolded
+  package name is derived from `--game-dir`'s basename (snake_case
+  normalized to kebab-case, `open-spiel-` prefixed when nested under
+  `open_spiel_env`), matching the real convention exactly — e.g.
+  `@kaggle-environments/open-spiel-nine-mens-morris-visualizer`. First
+  attempt used that name unconditionally, which meant a `v1` scaffold got
+  the *exact same* package name as the existing `default/` visualizer.
+  pnpm resolved this ambiguously: `pnpm --filter <name> dev` matched both
+  packages and started two dev servers fighting over the same port —
+  observed directly, not just reasoned about. Fixed: only `version ===
+  "default"` gets the bare name; every other version gets a `-<version>`
+  suffix (e.g. `...-visualizer-v1`).
+- The two wrong relative paths are fixed too, and now computed per-scaffold
+  instead of hardcoded — `game.css`'s `@source` and `tsconfig.json`'s
+  `include` both need the relative path back to
+  `web/design-system/packages/components/src`, but the correct depth
+  differs between a regular game (`kaggle_environments/envs/<game>/visualizer/<version>/`)
+  and an OpenSpiel one (two levels deeper, under `open_spiel_env/games/`) —
+  a single hardcoded relative path could never be right for both shapes.
 
-**Still broken / still open** — none of these are naming issues, so they
-weren't in scope of the rename pass above:
+Verified end-to-end, not just read through: scaffolded
+`kaggle_environments/envs/open_spiel_env/games/nine_mens_morris/visualizer/v1/`
+for real, wired real `PlayerBadge`s into the `opponent`/`player` slots
+(everything else stayed a flagged TODO — `BoardGrid`/`TurnIndicator`/etc.
+don't exist), ran it live, confirmed no console errors and correct
+`versus-vertical` grid behavior.
 
-- **Not a real workspace member.** The default `--dir apps` still writes to
-  `apps/<name>/`, and `pnpm-workspace.yaml` still has no `apps/*` glob (only
-  `web/*`, `web/design-system/packages/*`, and the two
-  `kaggle_environments/envs/...` globs) — `pnpm install` still wouldn't link
-  a scaffolded app's `workspace:*` deps.
-- **Two competing "where do visualizers live" conventions**, unreconciled:
-  every existing visualizer puts games at
-  `kaggle_environments/envs/<game>/visualizer/default/`; `gc-new-app` puts
-  them at `apps/<name>/`.
+**Still broken / still open** — none of these are naming or location
+issues, so they weren't in scope of the passes above:
+
 - **References components that don't exist.** The scaffolded `App.tsx`
   imports `GameAnnouncer` and `InfoPopup` — correctly named now, but neither
   is built yet (same gap the `component-selection.md` row above tracks).
 - **`layouts.css` depends on undefined tokens** — see the `layout.md` row
   above (`--color-bg`/`--color-fg` don't exist in `tokens.css`).
-- **No root `pnpm new-app` script.** `create-app/README.md` documents
-  `pnpm new-app --name blackjack --layout table` from the repo root; no such
-  script exists in the root `package.json`. The actual entry point today is
-  `node web/design-system/packages/create-app/src/cli.mjs --name ... --layout ...`
+- **No root `pnpm new-app` script.** `create-app/README.md` shows the
+  intended shorthand; no such script exists in the root `package.json`. The
+  actual entry point today is
+  `node web/design-system/packages/create-app/src/cli.mjs --game-dir ... --layout ...`
   or `pnpm --filter @kaggle-environments/design-system-create-app exec
-  gc-new-app -- --name ... --layout ...`.
+  gc-new-app -- --game-dir ... --layout ...`.
 - **Toolchain version drift.** The template's `package.json` still pins
   `react@^19`, `vite@^7`, `@vitejs/plugin-react@^5`, `tailwindcss@^4.1` —
   every other package in this repo is on `react@^18.2`, `vite@^5.0`,
@@ -188,27 +211,25 @@ visualizer, and this new, mostly-unbuilt shared design system.
 ## Net assessment
 
 The layout system, layout compiler, and app scaffolder all went from
-"doesn't exist" to "genuinely built and functional" this round — a real
-jump from the ~10-15% estimate this doc previously carried — and the
-naming/path mismatch that made them unusable in this repo (`@gamecraft/*`,
-`packages/*` at the root) is now fixed throughout both the packages and the
-skill docs that reference them. What's left blocking an actual end-to-end
-run is no longer "wrong names" but a smaller set of real decisions and
-gaps: where scaffolded apps should live (`apps/*` isn't a workspace member
-today), two undefined CSS custom properties, a still-missing root script,
-toolchain version drift, and the pre-existing component/asset/theming/
-animation gaps this file already tracked. See "Ran the new-visualizer flow"
-above for the full fixed-vs-open breakdown.
+"doesn't exist" to "genuinely built, functional, and verified end-to-end"
+this round — a real jump from the ~10-15% estimate this doc previously
+carried. Both blocking issues found along the way are now fixed: the
+naming/path mismatch (`@gamecraft/*`, `packages/*` at the root) throughout
+the packages and skill docs that reference them, and the wrong scaffold
+target (`apps/<name>/` instead of `<game-dir>/visualizer/<version>/`,
+including the package-name collision that location change surfaced). A
+real scaffold — `nine_mens_morris`'s `visualizer/v1`, with `PlayerBadge`
+wired into it — installs and runs live with no console errors. What's left
+is a smaller set of real gaps: two undefined CSS custom properties, a
+still-missing root script, toolchain version drift, and the pre-existing
+component/asset/theming/animation gaps this file already tracked. See "Ran
+the new-visualizer flow" above for the full fixed-vs-open breakdown.
 
 ## Next steps (not yet decided)
 
 - Decide, per doc, whether to trim to current reality (safe for an agent to
   follow today) or keep the target architecture with paths corrected and a
   built-vs-planned marker per item.
-- **Decide where scaffolded apps live** — either add an `apps/*` glob to
-  `pnpm-workspace.yaml`, or point `create-app` at
-  `kaggle_environments/envs/<game>/visualizer/default/` to match every
-  existing visualizer instead of inventing a second convention.
 - Add `--color-bg`/`--color-fg` to `tokens.css` (or change `layouts.css` to
   use tokens that already exist) so a scaffolded app isn't unstyled by
   default.
@@ -217,7 +238,7 @@ above for the full fixed-vs-open breakdown.
   `tailwindcss@^4.3.3`) — the react mismatch violates `components`'
   peerDependency range outright.
 - Add a root `pnpm new-app` script if `create-app`'s documented
-  `pnpm new-app --name ... --layout ...` invocation is meant to keep working
-  as written.
+  `pnpm new-app --game-dir ... --layout ...` invocation is meant to keep
+  working as written.
 - Once the docs are trustworthy, replace `.agents/skills/new-visualizer/SKILL.md`'s
   stub body with a real process that routes into them.

@@ -12,5 +12,5 @@
     "noEmit": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["src", "vite.config.ts", "../../web/design-system/packages/components/src"]
+  "include": ["src", "vite.config.ts", "__COMPONENTS_SRC_FROM_APP_ROOT__"]
 }
