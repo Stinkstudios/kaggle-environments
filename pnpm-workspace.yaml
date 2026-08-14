@@ -1,5 +1,6 @@
 packages:
   - web/*
+  - web/design-system/packages/*
   - kaggle_environments/envs/*/visualizer/*
   - kaggle_environments/envs/open_spiel_env/games/*/visualizer/*
 

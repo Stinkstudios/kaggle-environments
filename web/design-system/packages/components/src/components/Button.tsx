@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '../utils/cn';
+import { cn } from '@kaggle-environments/design-system-tools';
 
 const buttonVariants = cva(
   [

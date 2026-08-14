@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { cn } from '../utils/cn';
+import { cn } from '@kaggle-environments/design-system-tools';
 import geminiLogoPath from '../assets/gemini.svg';
 import playerBlankBlack from '../assets/player-blank-b.webp';
 import playerBlankWhite from '../assets/player-blank-w.webp';
 import playerReflectionBlack from '../assets/player-reflection-b.webp';
 import playerReflectionWhite from '../assets/player-reflection-w.webp';
-import { getAgentBrand } from '../utils/agent-brands';
+import { getAgentBrand } from '@kaggle-environments/design-system-tools';
 
 export type PlayerBadgeType = 'black' | 'white';
 export type PlayerBadgeRotate = 'none' | 'left' | 'right';

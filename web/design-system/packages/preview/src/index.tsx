@@ -1,6 +1,5 @@
-import * as React from 'react';
 import { createRoot } from 'react-dom/client';
-import './styles/main.css';
+import '@kaggle-environments/design-system-tokens/tokens.css';
 import {
   PlayerBadge,
   PlayerBadgeIcon,
@@ -9,7 +8,7 @@ import {
   PlayerBadgeLogo,
   SvgSprite,
   PlayerBadgeIconBackground,
-} from './components';
+} from '@kaggle-environments/design-system-components';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -30,6 +29,7 @@ function App() {
 
         <Section title="PlayerBadge">
           <div className="mt-6 flex flex-wrap items-center gap-8">
+
             <PlayerBadge type="black">
               <PlayerBadgeIcon>
                 <PlayerBadgeIconBackground variant="blank" />

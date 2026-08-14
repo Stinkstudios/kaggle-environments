@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { cn } from '../utils/cn';
+import { cn } from '@kaggle-environments/design-system-tools';
 
 export type CardProps = React.HTMLAttributes<HTMLDivElement>;
 
