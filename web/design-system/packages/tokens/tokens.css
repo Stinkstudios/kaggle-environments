@@ -1,0 +1,107 @@
+@layer theme, base, components;
+@import 'tailwindcss/theme.css' layer(theme);
+
+/*
+ * Tailwind's auto content-detection doesn't reliably reach across a
+ * pnpm-symlinked package boundary in a production `vite build` (it works in
+ * dev). This package is consumed via a package specifier
+ * (@kaggle-environments/design-system-tokens/tokens.css), not a relative
+ * import, so scan the components package explicitly.
+ */
+@source '../components/src';
+
+@theme {
+
+  --color-black: #050001;
+  --color-white: #F1F1F1;
+  --color-grey: #DCDCDC;
+  --color-dark-grey: #313131;
+  --color-highlight-blue: #BDEEFF;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* ---------- Typography ----------
+   * Inter for UI; 
+   * Mynerve ("hand") for handwritten accents: annotations, settings CTA, score-table values.
+   */
+   --font-sans: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+   --font-hand: 'Mynerve', cursive;
+   --font-mono: ui-monospace, 'SF Mono', monospace;
+}
+
+/*
+ * All tailwind classes should have a prefix selector of `#kaggle-design-system`.
+ * This avoids our classes leaking into other parts of the app, and helps
+ * with style overrides from the parent document.
+ */
+#kaggle-design-system {
+  @import 'tailwindcss/preflight.css';
+  @import 'tailwindcss/utilities.css';
+  -webkit-tap-highlight-color: transparent;
+}
+
+#kaggle-design-system :is(.grid-pile) {
+  display: grid;
+}
+
+#kaggle-design-system :is(.grid-pile > *, .grid-pile::before, .grid-pile::after) {
+  grid-area: 1 / 1;
+}
+
+/*
+ * Motion durations by element size + moment weight (skills/animation.md),
+ * matched to the shipped games:
+ *   micro  — shadow collapse (100ms), hover scale (150ms)
+ *   small  — switch thumb travel, stone pop (200ms)
+ *   medium — fades, pot prisoner pop (300–400ms)
+ *   large  — modal transform (500ms)
+ *   moment — game start/end reveals (banner enter 1.3s; game-over reveal
+ *            waits --dur-reveal-delay then staggers children by --dur-stagger)
+ * Use as duration-(--dur-medium) etc. Kept as plain vars (not a Tailwind
+ * namespace) so reduced-motion can collapse them all at once.
+ */
+ :root {
+  --dur-micro: 150ms;
+  --dur-small: 200ms;
+  --dur-medium: 350ms;
+  --dur-large: 500ms;
+  --dur-moment: 1300ms;
+  --dur-reveal-delay: 1000ms; /* pause before a game-over sequence reveals */
+  --dur-stagger: 100ms; /* per-child delay step inside a reveal sequence */
+
+  /* Interaction scale — hover lifts, press sinks (with shadow collapse). */
+  --scale-hover: 1.03;
+  --scale-press: 0.97;
+
+  --card-ratio: 5 / 7; /* playing card aspect */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-micro: 0.01ms;
+    --dur-small: 0.01ms;
+    --dur-medium: 0.01ms;
+    --dur-large: 0.01ms;
+    --dur-moment: 0.01ms;
+    --dur-reveal-delay: 0.01ms;
+    --dur-stagger: 0.01ms;
+    --scale-hover: 1;
+    --scale-press: 1;
+  }
+}
+
+.squiggle-border {
+  background-image:
+    url("./images/squiggle-solid.png"), url("./images/squiggle-solid.png"),
+    url("./images/squiggle-v.png"), url("./images/squiggle-v.png");
+  background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  background-position: top, bottom, left, right;
+  background-size:
+    5rem 2px,
+    5rem 2px,
+    2px 5rem,
+    2px 5rem;
+}
