@@ -56,27 +56,125 @@ future visualizer should follow too: import both
 point, and its own Vite build bundles everything (components' utility
 classes + tokens' images) without needing anything copied by hand.
 
-So a bare `packages/*` reference below (outside the four that now genuinely
-exist under `web/design-system/packages/`) is not a "not yet built" gap so
-much as a stale path from before consolidation; the doc fix there is a
-rename, not new tooling.
-`packages/layout-compiler` and `packages/create-app` are the exception —
-those describe tooling (a Figma→CSS compiler, an app scaffolder) that doesn't
-exist under any path yet.
+So a bare `packages/*` reference below (outside the packages that now
+genuinely exist under `web/design-system/packages/`) is not a "not yet
+built" gap so much as a stale path from before consolidation; the doc fix
+there is a rename, not new tooling.
+
+**Update:** `packages/layout-compiler`, `packages/create-app`, and
+`packages/layouts` now exist too — `web/design-system/packages/layout-compiler`
+(`@kaggle-environments/design-system-layout-compiler`, bin `gc-layout`),
+`web/design-system/packages/create-app`
+(`@kaggle-environments/design-system-create-app`, bin `gc-new-app`), and
+`web/design-system/packages/layouts`
+(`@kaggle-environments/design-system-layouts`, the real `.gc-layout`/
+`.gc-grid`/`.gc-slot-*` CSS `layout.md` describes). All three are genuinely
+functional — not stubs. They were originally wired against a different,
+hypothetical repo layout (`@gamecraft/*` names, `packages/*` at the repo
+root); every `@gamecraft/*` reference across all three packages (templates,
+READMEs, generated markdown) plus the general skill docs
+(`component-selection.md`, `theming.md`, `layout.md`) has since been renamed
+to the real `@kaggle-environments/design-system-*` names, and the two wrong
+relative paths in `create-app`'s scaffolded `game.css`/`tsconfig.json`
+(assumed `packages/` at the repo root instead of
+`web/design-system/packages/`) are fixed too — verified by re-scaffolding a
+test app and re-running the layout compiler against its fixtures. See "Ran
+the new-visualizer flow" below for what's fixed vs. what still isn't.
 
 ## Per-file gap
 
 | Doc | Describes | Actually exists |
 |---|---|---|
 | `README.md` | ~~Monorepo split: `packages/tokens`, `packages/layouts`, `packages/components`, `packages/assets`, `packages/layout-compiler`, `packages/create-app`~~ — **fixed**: now points at `web/design-system` and flags the layout system, layout compiler, asset manifest, and app scaffolder as not-yet-built | Matches reality. |
-| `visualizer-brief.md` | `apps/<game>/BRIEF.md` intake; Figma→CSS via `gc-layout` compiler (`@gamecraft/layout-compiler`) | No `apps/` dir (games live at `kaggle_environments/envs/<game>/visualizer/default/`), no compiler, no `BRIEF.md` convention anywhere in the repo. |
-| `layout.md` | Named layout enum (`table`, `versus-vertical`, `arena`, `side-panel`) via `.gc-layout`/`.gc-grid`/`.gc-slot-*` classes from `@gamecraft/layouts` | None of these classes or variants exist in `main.css`. No layout system at all yet — every existing visualizer hand-builds its own layout. |
-| `component-selection.md` | 10 components incl. `PlayingCard`, `CardHand`, `BoardGrid`, `Stone`, `ScoreValue`, `TurnIndicator`, `InfoPopup`, `Modal`, `GameAnnouncer` | Only `Button`, `Badge`, `Card`, `PlayerBadge`, `SvgSprite` exist (`web/design-system/packages/components/src/components/index.ts`). 8 of the table's rows have no component. |
+| `visualizer-brief.md` | `apps/<game>/BRIEF.md` intake; Figma→CSS via `gc-layout` compiler (`@kaggle-environments/design-system-layout-compiler`) | `gc-layout` (the compiler) genuinely exists and works (`web/design-system/packages/layout-compiler`), package name now correct in this doc — but no `apps/` dir (games live at `kaggle_environments/envs/<game>/visualizer/default/`, and `apps/*` isn't in `pnpm-workspace.yaml`), no `BRIEF.md` convention anywhere else in the repo. See "Ran the new-visualizer flow" below. |
+| `layout.md` | Named layout enum (`table`, `versus-vertical`, `arena`, `side-panel`) via `.gc-layout`/`.gc-grid`/`.gc-slot-*` classes from `@kaggle-environments/design-system-layouts` | **Now real** — `web/design-system/packages/layouts` (`@kaggle-environments/design-system-layouts`) defines exactly these 4 variants with wide/narrow/dense container-query grids, matching this doc's table, and the package name in this doc is correct. Only remaining gap: `layouts.css` references `var(--color-bg)`/`var(--color-fg)`, which don't exist in `tokens.css` (only `--color-black/white/grey/dark-grey/highlight-blue` do) — every layout renders unstyled until that's fixed. |
+| `component-selection.md` | 10 components incl. `PlayingCard`, `CardHand`, `BoardGrid`, `Stone`, `ScoreValue`, `TurnIndicator`, `InfoPopup`, `Modal`, `GameAnnouncer` | The roster shrank further, not grown: `Button`, `Badge`, and `Card` were removed (deleted from disk, mid-rework — the user's own in-progress change) since the previous pass of this doc. Only `PlayerBadge` and `SvgSprite` exist now (`web/design-system/packages/components/src/components/index.ts`); the doc has been rewritten to say so plainly rather than list a stale roster as if available. Everything else — including `Button` once it comes back, since it may look different — is a flagged gap, not an assumption. |
 | `assets.md` | `packages/assets/cards/` + generated `manifest.json` + `cardImage()` helper, 40 card faces | `web/design-system/packages/components/src/assets/` has only player badge/reflection webp + one icon sprite. No cards, no manifest, no helper (path is a rename per architecture note; the manifest/helper/card files themselves are still missing). |
 | `visualizer-behavior.md` | Turn flow / scoring / game-end conventions, entirely in terms of the missing components (`TurnIndicator`, `ScoreValue`, `Modal`, `GameAnnouncer`) | Not implementable until those components exist. |
 | `animation.md` | Duration tokens + easing utilities (`ease-enter`, `ease-move`, `ease-spring`, `animate-stone-place`) | Duration vars mostly exist in `main.css` (though `--dur-moment` is 1300ms there vs. "≈900ms" in the doc), but none of the named easing utilities or the stone-place keyframe exist. |
 | `theming.md` | 4 override hooks (`--color-accent`, `--color-board`, `--color-board-line`, `--color-card-back`) plus a large "never override" token set (`bg-surface-*`, `fg*`, `player-1..4`, etc.) | `main.css` only defines `--color-black/white/grey/dark-grey/highlight-blue` + radii/fonts/durations. None of the theming-doc's tokens exist. |
 | `audio.md` | Per-game `public/audio/manifest.json` convention | Self-contained convention, no path dependency — basically fine as written, just needs an example path anchored to `visualizer/default/public/`. |
+
+## Ran the new-visualizer flow — what actually breaks
+
+`.agents/skills/new-visualizer/SKILL.md` is still the 3-line stub — it
+doesn't mention `gc-new-app`, `gc-layout`, or any of the three new packages,
+so there's no real skill to "run" yet. Tracing through what the new
+packages' own READMEs document instead, and actually executing both CLIs
+against this repo (twice — before and after the naming/path fixes below)
+surfaced one root cause repeated everywhere: **the new packages were
+authored against a different, hypothetical repo layout** (`@gamecraft/*`
+package names, `packages/*` at the repo root, apps at `apps/<name>/`) **that
+doesn't match this repo** (`@kaggle-environments/design-system-*` names,
+packages nested under `web/design-system/packages/`, real visualizers at
+`kaggle_environments/envs/<game>/visualizer/default/`).
+
+**Fixed** (verified by re-scaffolding a test app with
+`node web/design-system/packages/create-app/src/cli.mjs --name test-game
+--layout table` and re-running `gc-layout` against its fixtures — inspected
+the actual output both times):
+
+- Every `@gamecraft/*` reference — dependency names in the scaffolded
+  `package.json` (`@gamecraft/components/layouts/tokens` →
+  `@kaggle-environments/design-system-components/-layouts/-tokens`),
+  `@import`s in `game.css`, the import in `App.tsx`, `create-app`'s and
+  `layout-compiler`'s own READMEs, `layout-compiler`'s generated CSS/markdown
+  output, and the general skill docs (`component-selection.md`,
+  `theming.md`, `layout.md`) — now use the real
+  `@kaggle-environments/design-system-*` names throughout.
+- `@gamecraft/assets` specifically had no real target (no `-assets` package
+  exists or is planned at that name — assets live inside
+  `packages/components/src/assets/`) — dropped from the scaffolded
+  `package.json`'s dependencies rather than renamed to a still-nonexistent
+  package.
+- The scaffolded app's own name changed from `@gamecraft/<name>` to
+  `@kaggle-environments/<name>` (not `-design-system-<name>` — it's a game
+  app, not a design-system package; matches how every existing per-game
+  visualizer is already named, e.g.
+  `@kaggle-environments/open-spiel-nine-mens-morris-visualizer`).
+- The two wrong relative paths are fixed: `game.css`'s
+  `@source "../../../packages/components/src"` and `tsconfig.json`'s
+  `"../../packages/components/src"` both now correctly include the
+  `web/design-system/` segment.
+
+**Still broken / still open** — none of these are naming issues, so they
+weren't in scope of the rename pass above:
+
+- **Not a real workspace member.** The default `--dir apps` still writes to
+  `apps/<name>/`, and `pnpm-workspace.yaml` still has no `apps/*` glob (only
+  `web/*`, `web/design-system/packages/*`, and the two
+  `kaggle_environments/envs/...` globs) — `pnpm install` still wouldn't link
+  a scaffolded app's `workspace:*` deps.
+- **Two competing "where do visualizers live" conventions**, unreconciled:
+  every existing visualizer puts games at
+  `kaggle_environments/envs/<game>/visualizer/default/`; `gc-new-app` puts
+  them at `apps/<name>/`.
+- **References components that don't exist.** The scaffolded `App.tsx`
+  imports `GameAnnouncer` and `InfoPopup` — correctly named now, but neither
+  is built yet (same gap the `component-selection.md` row above tracks).
+- **`layouts.css` depends on undefined tokens** — see the `layout.md` row
+  above (`--color-bg`/`--color-fg` don't exist in `tokens.css`).
+- **No root `pnpm new-app` script.** `create-app/README.md` documents
+  `pnpm new-app --name blackjack --layout table` from the repo root; no such
+  script exists in the root `package.json`. The actual entry point today is
+  `node web/design-system/packages/create-app/src/cli.mjs --name ... --layout ...`
+  or `pnpm --filter @kaggle-environments/design-system-create-app exec
+  gc-new-app -- --name ... --layout ...`.
+- **Toolchain version drift.** The template's `package.json` still pins
+  `react@^19`, `vite@^7`, `@vitejs/plugin-react@^5`, `tailwindcss@^4.1` —
+  every other package in this repo is on `react@^18.2`, `vite@^5.0`,
+  `tailwindcss@^4.3.3`. `@kaggle-environments/design-system-components`
+  declares `peerDependencies: { react: ^18.0.0 }`, which `^19.0.0` violates
+  outright.
+- **`assets.md` still references `@gamecraft/assets`** (`packages/assets/`
+  + a `build-manifest` script) — left alone since, same as the scaffolded
+  app's dependency above, there's no real package to rename it to; this is
+  the pre-existing `assets.md` gap, not a naming-pass miss.
+- **`--out` mode's exit code.** `gc-layout --out ...` exits non-zero (3,
+  observed) whenever there are warnings (missing descriptions, no dense
+  frame) even though it successfully writes both files — a script gating on
+  exit code would treat a normal "TODO, please fill in descriptions" run as
+  a failure.
 
 ## Separately worth knowing
 
@@ -89,20 +187,37 @@ visualizer, and this new, mostly-unbuilt shared design system.
 
 ## Net assessment
 
-These docs read as a design doc for where the system is headed, at maybe
-10-15% implemented. Renaming `packages/tokens` / `packages/layouts` /
-`packages/components` / `packages/assets` references to `web/design-system`
-is a mechanical fix (see architecture note above) — but that alone isn't
-sufficient: 8 of 10 listed components, the entire layout-variant system, the
-layout compiler, and the asset manifest pipeline genuinely don't exist yet,
-regardless of path. Bringing the docs in line with reality means either
-building those missing pieces or rewriting the docs to not assume them (or
-some explicit mix, tracked per-doc above).
+The layout system, layout compiler, and app scaffolder all went from
+"doesn't exist" to "genuinely built and functional" this round — a real
+jump from the ~10-15% estimate this doc previously carried — and the
+naming/path mismatch that made them unusable in this repo (`@gamecraft/*`,
+`packages/*` at the root) is now fixed throughout both the packages and the
+skill docs that reference them. What's left blocking an actual end-to-end
+run is no longer "wrong names" but a smaller set of real decisions and
+gaps: where scaffolded apps should live (`apps/*` isn't a workspace member
+today), two undefined CSS custom properties, a still-missing root script,
+toolchain version drift, and the pre-existing component/asset/theming/
+animation gaps this file already tracked. See "Ran the new-visualizer flow"
+above for the full fixed-vs-open breakdown.
 
 ## Next steps (not yet decided)
 
 - Decide, per doc, whether to trim to current reality (safe for an agent to
   follow today) or keep the target architecture with paths corrected and a
   built-vs-planned marker per item.
+- **Decide where scaffolded apps live** — either add an `apps/*` glob to
+  `pnpm-workspace.yaml`, or point `create-app` at
+  `kaggle_environments/envs/<game>/visualizer/default/` to match every
+  existing visualizer instead of inventing a second convention.
+- Add `--color-bg`/`--color-fg` to `tokens.css` (or change `layouts.css` to
+  use tokens that already exist) so a scaffolded app isn't unstyled by
+  default.
+- Align `create-app`'s template toolchain versions (`react@^19`, `vite@^7`,
+  `tailwindcss@^4.1`) with the rest of the repo (`react@^18.2`, `vite@^5.0`,
+  `tailwindcss@^4.3.3`) — the react mismatch violates `components`'
+  peerDependency range outright.
+- Add a root `pnpm new-app` script if `create-app`'s documented
+  `pnpm new-app --name ... --layout ...` invocation is meant to keep working
+  as written.
 - Once the docs are trustworthy, replace `.agents/skills/new-visualizer/SKILL.md`'s
   stub body with a real process that routes into them.

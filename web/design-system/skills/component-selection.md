@@ -1,24 +1,17 @@
 # Skill: component selection
 
-Map every UI need to an existing `@gamecraft/components` export. Zero custom UI primitives.
+Map every UI need to an existing `@kaggle-environments/design-system-components` export. Zero custom UI primitives. The component roster is small and actively changing right now — check `web/design-system/packages/components/src/components/index.ts` for what's *actually* exported before assuming anything below exists; this doc can lag the real package.
 
 ## Decision table
 
 | Need | Use | Never |
 | --- | --- | --- |
-| A playing card | `<PlayingCard rank suit faceDown>` | hand-rolled divs, images of cards |
-| Cards in a hand | `<CardHand label>` wrapping PlayingCards | manual negative margins |
-| A grid board (n×m cells) | `<BoardGrid cols rows renderCell>` | tables, SVG grids |
-| Round piece on a board | `<Stone player>` inside `renderCell` | emoji, images |
 | A player (name/avatar) | `<PlayerBadge>` compound — see "PlayerBadge composition" below | custom cards |
-| A score number | `<ScoreValue value>` | bare text (it animates changes) |
-| Whose turn it is | `<TurnIndicator text player>` | text-only status |
-| Game explanation | `<InfoPopup>` with 1–2 sentences | modals, long help pages |
-| Game over / confirm | `<Modal open title actions>` | inline banners, window.alert |
-| An action | `<Button variant>` | links, divs with onClick |
-| Screen-reader updates | one `<GameAnnouncer message>` at root | multiple live regions |
+| Icon sprite defs (once, at root) | `<SvgSprite>` | inlining `<svg>` per use |
 
-## Choice-count rules
+Everything else a game needs — buttons, badges/pills, generic cards, playing cards, a board grid, board pieces, scores, turn indicators, popups, modals, screen-reader announcements — **does not exist yet**. See "Known gaps" below. Don't improvise a replacement; flag it and stop.
+
+## Choice-count rules (once `Button` exists)
 
 - User picks between **2–4 actions** (hit/stand): a row of `<Button>`s in `controls`. Exactly one `variant="primary"` — the most likely/forward action. Rest `secondary`.
 - **5+ options**: a `<select>` (native) — flag it, a styled Dropdown is a known gap.
@@ -41,4 +34,22 @@ Map every UI need to an existing `@gamecraft/components` export. Zero custom UI 
 
 ## Known gaps (flag, don't improvise)
 
-Dice, chips/betting stack, timer/clock, dropdown, toast, replay scrubber. If the game needs one, stop and report the gap.
+Nothing here has a component yet — including `Button`, which existed before but was pulled while it's reworked, so don't assume it's stable even once it reappears. Check `index.ts` for the current truth.
+
+| Need | Was / will be | Status |
+| --- | --- | --- |
+| An action | `Button` | removed for rework — was `<Button variant>` |
+| A pill/label | `Badge` | removed for rework |
+| A generic container | `Card` | removed for rework |
+| A playing card | `PlayingCard` | never built |
+| Cards in a hand | `CardHand` | never built |
+| A grid board (n×m cells) | `BoardGrid` | never built |
+| Round piece on a board | `Stone` | never built |
+| A score number | `ScoreValue` | never built |
+| Whose turn it is | `TurnIndicator` | never built |
+| Game explanation | `InfoPopup` | never built |
+| Game over / confirm | `Modal` | never built |
+| Screen-reader updates | `GameAnnouncer` | never built |
+| Dice, chips/betting stack, timer/clock, dropdown, toast, replay scrubber | — | never built |
+
+If the game needs any of these, stop and report the gap — don't hand-roll a substitute, even a small one.
