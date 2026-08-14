@@ -18,7 +18,7 @@ for what's actually built vs. still aspirational in each row below.
 | Layout variants (grid templates) | *not yet implemented* — see `layout.md` | n/a until built |
 | React components (Tailwind-styled) | `web/design-system/packages/components/src/` | `import { … } from "@kaggle-environments/design-system-components"` |
 | Shared utilities (`cn`, agent-brand resolution) | `web/design-system/packages/tools/src/` | `import { … } from "@kaggle-environments/design-system-tools"` |
-| Component gallery (dev-only, not published) | `web/design-system/packages/preview/` | `pnpm --filter @kaggle-environments/design-system-preview dev` |
+| Component gallery (dev-only, not published) | `web/design-system/packages/components/.storybook/` | `pnpm --filter @kaggle-environments/design-system-components storybook` |
 | Designed component assets (logos, avatar art) | `web/design-system/packages/components/src/assets/` | *no manifest/helper yet* — see `assets.md` |
 | Layout compiler (Figma SVG → variant) | *does not exist yet* | n/a — client-drawn layouts have no path today; flag for a human |
 | New app scaffold (generic boilerplate) | *does not exist yet* | new visualizers are created under `kaggle_environments/envs/<game>/visualizer/default/` via the `create-visualizer` / `new-visualizer` skills, not a `packages/create-app` scaffolder |

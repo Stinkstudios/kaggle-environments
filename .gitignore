@@ -148,6 +148,7 @@ temp.*
 node_modules
 **/node_modules
 **/tsconfig.tsbuildinfo
+**/storybook-static
 
 # Java class files
 *.class
