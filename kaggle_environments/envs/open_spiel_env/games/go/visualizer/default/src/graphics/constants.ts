@@ -1,4 +1,7 @@
-import type { GridPos } from '../types/game';
+import type { FamilyInfo } from '@kaggle-environments/design-system-assets';
+import goFamily from '@kaggle-environments/design-system-assets/go';
+import fxFamily from '@kaggle-environments/design-system-assets/fx';
+import type { CellValue, GridPos } from '../types/game';
 
 export const BOARD_PX = 512;
 export const BOARD_PADDING = 56;
@@ -78,3 +81,45 @@ export function getNeighbors(row: number, col: number, boardSize: number): GridP
   }
   return neighbors;
 }
+
+/**
+ * Asset families this visualizer loads at start-up.
+ *
+ * `go` is this game's own art — stones, board furniture and territory marks.
+ * `fx` is the shared particle family: the three capture puffs are byte-identical
+ * to chess's, which is what earned them a place outside a game-scoped family.
+ *
+ * These are imported per-family on purpose. The package root is a barrel over
+ * every family, so importing `pieceFamily` from it would bundle the chess set
+ * and the 54-card deck into this visualizer — a megabyte of artwork no go board
+ * ever draws. Naming each family as an import keeps the bundle honest: what you
+ * see here is what ships.
+ */
+export const ASSET_FAMILIES: FamilyInfo[] = [goFamily, fxFamily];
+
+/** Board cell values -> the colour prefix used in the shared asset id vocabulary. */
+const COLOR_PREFIX: Record<Exclude<CellValue, '.'>, string> = { B: 'b', W: 'w' };
+
+/**
+ * Stable asset ids for the per-colour artwork, e.g. stoneId('B') -> 'go:b-stone'.
+ * Renderers address artwork by id; filenames never appear in game code.
+ */
+export function stoneId(value: Exclude<CellValue, '.'>): string {
+  return `go:${COLOR_PREFIX[value]}-stone`;
+}
+
+export function markerId(value: Exclude<CellValue, '.'>): string {
+  return `go:${COLOR_PREFIX[value]}-marker`;
+}
+
+export function territoryId(value: Exclude<CellValue, '.'>): string {
+  return `go:${COLOR_PREFIX[value]}-territory`;
+}
+
+/** Single-variant ids, named here so no module has to spell them by hand. */
+export const SHADOW_ID = 'go:shadow';
+export const HOSHI_ID = 'go:hoshi';
+export const GRID_LINE_ID = 'go:grid-line';
+
+/** The shared capture-puff particles, drawn from at random on capture. */
+export const PUFF_IDS = ['fx:puff1', 'fx:puff2', 'fx:puff3'] as const;

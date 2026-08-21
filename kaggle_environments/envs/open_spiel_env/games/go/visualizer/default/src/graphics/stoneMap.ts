@@ -1,6 +1,7 @@
-import { Sprite, type Spritesheet } from 'pixi.js';
+import { Sprite } from 'pixi.js';
 import type { CellValue } from '../types/game';
-import { getCellSize, getStoneScale, gridToPixel } from './constants';
+import { SHADOW_ID, getCellSize, getStoneScale, gridToPixel, stoneId } from './constants';
+import type { TextureMap } from './textures';
 
 export interface RestState {
   x: number;
@@ -39,21 +40,20 @@ export function createStonePair(
   col: number,
   value: Exclude<CellValue, '.'>,
   boardSize: number,
-  sheet: Spritesheet
+  textures: TextureMap
 ): StonePair {
   const cell = getCellSize(boardSize);
   const stoneSize = cell * getStoneScale(boardSize);
   const shadowOffset = cell * 0.06;
   const { x, y } = gridToPixel(row, col, boardSize);
 
-  const shadow = new Sprite(sheet.textures['shadow.png']);
+  const shadow = new Sprite(textures[SHADOW_ID]);
   shadow.anchor.set(0.5);
   shadow.position.set(x - shadowOffset, y + shadowOffset);
   shadow.width = stoneSize;
   shadow.height = stoneSize;
 
-  const texName = value === 'B' ? 'black.png' : 'white.png';
-  const stone = new Sprite(sheet.textures[texName]);
+  const stone = new Sprite(textures[stoneId(value)]);
   stone.anchor.set(0.5);
   stone.position.set(x, y);
   stone.width = stoneSize;

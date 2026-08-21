@@ -1,3 +1,9 @@
+import type { FamilyInfo } from '@kaggle-environments/design-system-assets';
+import chessFamily from '@kaggle-environments/design-system-assets/chess';
+import boardFamily from '@kaggle-environments/design-system-assets/board';
+import fxFamily from '@kaggle-environments/design-system-assets/fx';
+import chessFxFamily from '@kaggle-environments/design-system-assets/chess-fx';
+
 export const BOARD_SIZE = 8;
 export const CHAR_CODE_A = 97; // 'a'.charCodeAt(0)
 
@@ -39,5 +45,11 @@ export function pieceId(color: PieceColor, type: PieceType): string {
  * `fx` is the shared particle family (puffs, used by go too); `chess-fx` is
  * this game's own — several of those particles are chess piece silhouettes and
  * are deliberately not offered as generic decoration.
+ *
+ * These are imported per-family on purpose. The package root is a barrel over
+ * every family, so importing `pieceFamily` from it would bundle the 54-card
+ * deck into this visualizer — a megabyte of artwork no chess board ever draws.
+ * Naming each family as an import keeps the bundle honest: what you see here is
+ * what ships.
  */
-export const ASSET_FAMILIES = ['chess', 'board', 'fx', 'chess-fx'] as const;
+export const ASSET_FAMILIES: FamilyInfo[] = [chessFamily, boardFamily, fxFamily, chessFxFamily];

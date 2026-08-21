@@ -1,8 +1,9 @@
 import gsap from 'gsap';
-import { Sprite, type Container, type Spritesheet } from 'pixi.js';
+import { Sprite, type Container } from 'pixi.js';
 import type { GridPos } from '../types/game';
-import { getCellSize, getStoneScale } from './constants';
+import { getCellSize, getStoneScale, markerId } from './constants';
 import { posKey, type StoneMap } from './stoneMap';
+import type { TextureMap } from './textures';
 
 const MARKER_POP_SCALE = 1.6;
 const MARKER_POP_ROTATION = 0.4;
@@ -14,15 +15,15 @@ export class Marker {
   private sprite: Sprite;
   private restScaleX: number;
   private restScaleY: number;
-  private sheet: Spritesheet;
+  private textures: TextureMap;
   private stoneLayer: Container;
 
-  constructor(sheet: Spritesheet, stoneLayer: Container, boardSize: number) {
-    this.sheet = sheet;
+  constructor(textures: TextureMap, stoneLayer: Container, boardSize: number) {
+    this.textures = textures;
     this.stoneLayer = stoneLayer;
 
     const markerSize = getCellSize(boardSize) * getStoneScale(boardSize) * MARKER_RATIO;
-    const sprite = new Sprite(sheet.textures['black-active-marker.png']);
+    const sprite = new Sprite(textures[markerId('B')]);
     sprite.anchor.set(0.5);
     sprite.width = markerSize;
     sprite.height = markerSize;
@@ -41,13 +42,13 @@ export class Marker {
 
   update(lastPlayed: GridPos | null, stoneMap: StoneMap, isSingleStep: boolean): gsap.core.Animation[] {
     const anims: gsap.core.Animation[] = [];
-    const { sprite, sheet, stoneLayer, restScaleX, restScaleY } = this;
+    const { sprite, textures, stoneLayer, restScaleX, restScaleY } = this;
 
     const lastPlayedKey = lastPlayed ? posKey(lastPlayed.row, lastPlayed.col) : null;
     const lastPair = lastPlayedKey ? stoneMap.get(lastPlayedKey) : undefined;
 
     if (lastPair) {
-      sprite.texture = sheet.textures[lastPair.value === 'B' ? 'black-active-marker.png' : 'white-active-marker.png'];
+      sprite.texture = textures[markerId(lastPair.value)];
       sprite.position.set(lastPair.stoneRest.x, lastPair.stoneRest.y);
       sprite.visible = true;
       stoneLayer.addChild(sprite);

@@ -134,6 +134,44 @@
         }
       }
     },
+    "go": {
+      "description": "Go stones, board furniture and territory overlays",
+      "tintable": false,
+      "targets": [
+        "pixi",
+        "dom"
+      ],
+      "$note": "No sourceSize: this family is deliberately mixed-resolution. The stones are 256×256 masters, the shadow 128, markers 88, territory marks 84, hoshi 48, and grid-line is a 74×4 strip tiled along each board line. Every piece is drawn to a size that suits its job and is scaled at render time, so declaring one ratio for the family would be a lie the build would enforce. The three capture puffs are NOT here — they are byte-identical to chess's and live in the shared `fx` family.",
+      "pieces": {
+        "b-stone": {
+          "label": "black stone"
+        },
+        "w-stone": {
+          "label": "white stone"
+        },
+        "b-marker": {
+          "label": "black's last move"
+        },
+        "w-marker": {
+          "label": "white's last move"
+        },
+        "b-territory": {
+          "label": "black territory"
+        },
+        "w-territory": {
+          "label": "white territory"
+        },
+        "shadow": {
+          "decorative": true
+        },
+        "hoshi": {
+          "decorative": true
+        },
+        "grid-line": {
+          "decorative": true
+        }
+      }
+    },
     "card": {
       "description": "Playing cards. 52 faces + back + joker.",
       "sourceSize": {
@@ -143,7 +181,7 @@
       "tintable": false,
       "individual": true,
       "atlas": false,
-      "$note": "targets:[\"dom\"] + atlas:false \u2014 every card game here (gin_rummy, bridge_arena, repeated_poker) is DOM and shows a hand at a time, so per-card files are the right shape. If a Pixi card game ever appears, add \"pixi\" to targets and set atlas:true: all 54 fit one 4096 sheet at 419x583 (9x7=63 slots, 91% of source), so this is a downscale decision, not a multi-page one.",
+      "$note": "targets:[\"dom\"] + atlas:false — every card game here (gin_rummy, bridge_arena, repeated_poker) is DOM and shows a hand at a time, so per-card files are the right shape. If a Pixi card game ever appears, add \"pixi\" to targets and set atlas:true: all 54 fit one 4096 sheet at 419x583 (9x7=63 slots, 91% of source), so this is a downscale decision, not a multi-page one.",
       "pieces": {
         "a-spade": {
           "label": "ace of spades"

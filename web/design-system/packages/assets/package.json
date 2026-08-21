@@ -8,6 +8,10 @@
       ".": {
         "import": "./dist/index.js",
         "types": "./dist/index.d.ts"
+      },
+      "./*": {
+        "import": "./dist/generated/*.js",
+        "types": "./dist/generated/*.d.ts"
       }
     }
   },
@@ -16,6 +20,11 @@
       "development": "./src/index.ts",
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./*": {
+      "development": "./src/generated/*.ts",
+      "import": "./dist/generated/*.js",
+      "types": "./dist/generated/*.d.ts"
     }
   },
   "main": "./dist/index.js",
@@ -38,5 +47,27 @@
     "typescript": "^5.0.0",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^4.5.4"
+  },
+  "typesVersions": {
+    "*": {
+      "chess": [
+        "./dist/generated/chess.d.ts"
+      ],
+      "board": [
+        "./dist/generated/board.d.ts"
+      ],
+      "fx": [
+        "./dist/generated/fx.d.ts"
+      ],
+      "chess-fx": [
+        "./dist/generated/chess-fx.d.ts"
+      ],
+      "go": [
+        "./dist/generated/go.d.ts"
+      ],
+      "card": [
+        "./dist/generated/card.d.ts"
+      ]
+    }
   }
 }
