@@ -3,6 +3,7 @@ import type { Chess } from 'chess.js';
 import { animate } from 'motion';
 import type { Engine } from './engine';
 import { squareToPixel } from './coordinates';
+import { pieceId } from './constants';
 
 const PIECE_FADE_DURATION = 0.3; // seconds — piece fades and shrinks
 const PIECE_SCALE_TARGET = 0.6; // piece shrinks to 60% of original
@@ -16,7 +17,7 @@ export function syncCapture(engine: Engine, chess: Chess, snap: boolean) {
   const { squareSize, textures, resources, boardOffset } = engine;
 
   const capturedColor = lastMove.color === 'w' ? 'b' : 'w';
-  const texture = textures[`${capturedColor}${lastMove.captured}.png`];
+  const texture = textures[pieceId(capturedColor, lastMove.captured)];
   if (!texture) return;
 
   // En passant: captured pawn sits on the target file but the source rank.

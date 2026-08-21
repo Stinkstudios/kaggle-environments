@@ -1,0 +1,13 @@
+# Packer scratch — staging tree in, raw packer output out. Regenerated every build.
+/.packer-work/
+# AssetPack's own cache.
+/.assetpack/
+# tsc incremental state.
+tsconfig.tsbuildinfo
+# Scratch left by tooling that cannot delete files on a mounted filesystem.
+/_to_delete/
+
+# NOTE: packed/ and src/generated/ ARE committed, deliberately — see README,
+# "What is and isn't committed". This repo has always tracked packed atlases
+# (chess and go both commit sprites.json/.webp under src/), and committing them
+# means a fresh clone renders without running the packer at all.

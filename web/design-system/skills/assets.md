@@ -4,25 +4,146 @@
 
 ## Where assets live
 
-`packages/assets/` (`@gamecraft/assets`), one directory per asset family, each with a generated `manifest.json` describing every file. The manifest — not the directory listing — is the source of truth an agent reads.
+`web/design-system/packages/assets` (`@kaggle-environments/design-system-assets`).
 
-| Family | Directory | Helper |
+```
+src/<family>/<id>.png     the artwork — committed
+families.json             the roster: which ids exist, labels, a11y decisions
+packed/<family>/          committed build output
+  <family>.webp             the sheet
+  <family>.webp.json        frame table (untrimmed)
+  <id>.webp                 only for families with "individual": true
+  manifest.json             ids, labels, frames, missing[]
+```
+
+The **manifest — not the directory listing** — is the source of truth. Resolve
+through the API, never by guessing file paths:
+
+```ts
+import { pieceAsset, pieceFamily, missingPieces } from '@kaggle-environments/design-system-assets';
+
+pieceAsset('chess:w-king')   // → PieceAsset | null
+pieceFamily('card')          // → atlas + pieces + missing[]
+```
+
+Or in DOM, just use the component, which picks the right path itself:
+
+```tsx
+import { Piece } from '@kaggle-environments/design-system-components';
+<Piece id="card:a-spade" size="lg" />
+```
+
+## Families
+
+| Family | ids | Output | Notes |
+| --- | --- | --- | --- |
+| `chess` | `chess:{w,b}-{king,queen,rook,bishop,knight,pawn}` | atlas | 256×256, 12 pieces |
+| `board` | `board:dark-tile` | atlas | 128×128 |
+| `fx` | `fx:puff1-3` | atlas | shared decorative particles |
+| `chess-fx` | `chess-fx:{squiggle-1-3,rook1-4,bishop1-2,pawn,knight-shadow}` | atlas | chess-only, game-scoped |
+| `card` | `card:<rank>-<suit>`, `card:back`, `card:joker` | individual | 462×643, 54 pieces — **artwork not yet added** |
+
+Card ids: rank `a, 2…10, j, q, k` (`10`, not `t`); suit singular lowercase
+(`spade`, `heart`, `diamond`, `club`). So `card:a-spade`, `card:10-heart`,
+`card:k-club`.
+
+## Serving both renderers
+
+A family declares which renderers it serves:
+
+```json
+"targets": ["pixi", "dom"]
+```
+
+**An atlas serves both.** Pixi loads it as a `Spritesheet`; DOM positions it with
+CSS `background-position` (frames are packed untrimmed precisely so this needs
+no offset maths). It's the same URL, so the browser fetches it once even when a
+Pixi board and DOM chrome in the same visualizer both use it. This is the
+default and it needs no thought.
+
+**Individual files serve DOM only.** A family sets `"individual": true` to emit
+one file per piece, and `"atlas": false` to skip the sheet. Pixi cannot consume
+an atlas-less family — the build **refuses** `targets: ["pixi"]` with
+`atlas: false`, and the Pixi loader throws rather than rendering an empty board.
+
+| Family | Output | Targets |
 | --- | --- | --- |
-| Playing card faces | `cards/` (555×776 PNG, 5:7) | `cardImage(rank, suit)` → URL or `null` |
+| `chess`, `board`, `fx`, `chess-fx` | atlas | pixi + dom |
+| `card` | individual | dom |
+
+Cards are DOM-only because every card game here is DOM and shows a hand at a
+time — fetching 54 faces to display five would be wasteful. If a Pixi card game
+appears, add `"pixi"` to targets and set `"atlas": true`: all 54 fit a single
+4096px sheet at 419×583 (9×7 = 63 slots, 91% of source), so it's a modest
+downscale, not a multi-page rebuild. Keep `"individual": true` alongside it so
+the DOM games don't regress.
+
+## Shared vs game-scoped families
+
+A family in this package is a claim that its art is **reusable**. Art that only
+one game uses gets a game-scoped family name — `chess-fx`, not `fx`.
+
+The test is evidence, not intent: the three `fx` puffs are byte-identical
+between the chess and go visualizers, which is what earns them a shared family.
+Everything else chess uses for motion (`rook1-4`, `bishop1-2`, `pawn`,
+`knight-shadow`, `squiggle-1..3`) lives in `chess-fx`, because several of those
+are literally chess piece silhouettes — filing them under a generic `fx` invites
+another game to import a rook outline as "a particle".
+
+Promote to a shared family when a second game actually needs the art, not in
+anticipation that it might.
 
 ## Rules
 
-- Resolve through the helper/manifest, never by guessing file paths. Filename contract for cards: `<rank>-<suit>.png`, rank `a,2..10,j,q,k`, suit singular lowercase.
-- Helper returns `null` → no asset yet. Pass it through anyway (`image={cardImage(rank, suit)}`); components fall back to programmatic rendering. Report the gap (the manifest's `missing` list) — don't fake the asset.
-- Never mix sources within one visual family in a game: if some cards in play would be assets and others programmatic fallbacks, that's acceptable during development but must be flagged as a blocker for delivery.
-- Assets are full-bleed: components crop with `object-cover` to the family's fixed ratio. Never stretch (`object-fill`) or letterbox.
-- New/renamed files: run `pnpm --filter @gamecraft/assets build-manifest` to regenerate the manifest. Never hand-edit `manifest.json`.
-- Adding a new family = new directory + manifest generation + helper + row in the table above. That's a human-approved design-system change, not something to improvise mid-game-build.
+- Resolve through `pieceAsset()`/`pieceFamily()`, never by guessing file paths.
+- Returns `null` → no asset yet. Pass it through (`<Piece>` renders its
+  `fallback`); report the gap from the manifest's `missing[]`. Don't fake it,
+  and never substitute a different piece's art.
+- Never mix sources within one visual family in a shipped game: some cards as
+  assets and others programmatic is acceptable during development and a
+  **release blocker** at delivery.
+- Assets keep a fixed per-family ratio and are fitted, never stretched.
+- Adding a piece = drop the PNG in `src/<family>/`, declare it in
+  `families.json` with a label (or `decorative: true`), rebuild. The build
+  **fails** on undeclared files — every piece needs a label and an
+  accessibility decision before it can ship.
+- Declaring a piece *before* the artwork exists is the correct way to record a
+  known gap; it lands in `missing[]`.
+- Never hand-edit `manifest.json` or `src/generated/registry.ts`.
+
+```
+pnpm --filter @kaggle-environments/design-system-assets build:assets
+pnpm --filter @kaggle-environments/design-system-assets check:roster   # no deps needed
+```
 
 ## Known state
 
-Cards: ranks 2–10 + ace, all four suits (40 files). **Face cards J/Q/K have no assets yet** — they render programmatically until designed. Card backs: no asset yet, programmatic back (`bg-card-back`).
+| Family | State |
+| --- | --- |
+| `chess` | complete — 12 pieces, atlas |
+| `board` | complete — 1 tile, atlas |
+| `fx` | complete — 3 shared puffs, atlas |
+| `chess-fx` | complete — 11 chess-only particles, atlas |
+| `card` | complete — 54 faces, individual files, DOM-only |
 
-## Performance note
+Runtime tinting is not implemented; no `tintable` family exists yet. It lands
+with the first one (discs).
 
-Source PNGs are ~700KB each. Fine for local dev; before production delivery they need an optimization pass (resize to display density, WebP/AVIF). Don't do this ad hoc per game — it belongs in the assets package build.
+## What to build next
+
+Roughly six families cover the whole visualizer roster. Ordered by games served
+per unit of design effort:
+
+| Family | Games it would serve |
+| --- | --- |
+| **discs / stones** | go, othello, connect_four, checkers, clobber, nine_mens_morris, y, havannah, dark_hex, coin_game, coin_game_arena |
+| **figurative** | amazons, breakthrough, lines_of_action, quoridor (chess already done) |
+| **glyph tiles** | shogi (kanji), hive (hex bug tiles), dots_and_boxes |
+| **dice** | backgammon |
+| **chips / seeds** | repeated_poker, oshi_zumo, mancala |
+
+Discs are far and away the best first move — one tintable disc plus a colour
+token replaces hand-rolled `ctx.arc` drawing in about ten games. Agent and unit
+sprites (snake, markov_soccer, capture_the_flag, ant_foraging, lux_*, halite,
+kore_fleets) are deliberately out of scope: they're per-game characters, not
+reusable pieces.

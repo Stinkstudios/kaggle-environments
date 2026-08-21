@@ -92,11 +92,11 @@ the new-visualizer flow" below for what's fixed vs. what still isn't.
 
 | Doc | Describes | Actually exists |
 |---|---|---|
-| `README.md` | ~~Monorepo split: `packages/tokens`, `packages/layouts`, `packages/components`, `packages/assets`, `packages/layout-compiler`, `packages/create-app`~~ — **fixed**: now points at `web/design-system` and flags the layout system, layout compiler, asset manifest, and app scaffolder as not-yet-built | Matches reality. |
+| `README.md` | ~~Monorepo split: `packages/tokens`, `packages/layouts`, `packages/components`, `packages/assets`, `packages/layout-compiler`, `packages/create-app`~~ — **fixed**: now points at `web/design-system` | Matches reality. Note `packages/assets` now genuinely exists (see the `assets.md` row) — it is no longer a not-yet-built item. |
 | `visualizer-brief.md` | `<game-dir>/visualizer/<version>/BRIEF.md` intake; Figma→CSS via `gc-layout` compiler (`@kaggle-environments/design-system-layout-compiler`) | `gc-layout` (the compiler) genuinely exists and works (`web/design-system/packages/layout-compiler`); `gc-new-app` genuinely writes `BRIEF.md` at that exact path now — both package name and location in this doc are correct. See "Ran the new-visualizer flow" below. |
 | `layout.md` | Named layout enum (`table`, `versus-vertical`, `arena`, `side-panel`) via `.gc-layout`/`.gc-grid`/`.gc-slot-*` classes from `@kaggle-environments/design-system-layouts` | **Now real** — `web/design-system/packages/layouts` (`@kaggle-environments/design-system-layouts`) defines exactly these 4 variants with wide/narrow/dense container-query grids, matching this doc's table, and the package name in this doc is correct. Only remaining gap: `layouts.css` references `var(--color-bg)`/`var(--color-fg)`, which don't exist in `tokens.css` (only `--color-black/white/grey/dark-grey/highlight-blue` do) — every layout renders unstyled until that's fixed. |
 | `component-selection.md` | 10 components incl. `PlayingCard`, `CardHand`, `BoardGrid`, `Stone`, `ScoreValue`, `TurnIndicator`, `InfoPopup`, `Modal`, `GameAnnouncer` | The roster shrank further, not grown: `Button`, `Badge`, and `Card` were removed (deleted from disk, mid-rework — the user's own in-progress change) since the previous pass of this doc. Only `PlayerBadge` and `SvgSprite` exist now (`web/design-system/packages/components/src/components/index.ts`); the doc has been rewritten to say so plainly rather than list a stale roster as if available. Everything else — including `Button` once it comes back, since it may look different — is a flagged gap, not an assumption. |
-| `assets.md` | `packages/assets/cards/` + generated `manifest.json` + `cardImage()` helper, 40 card faces | `web/design-system/packages/components/src/assets/` has only player badge/reflection webp + one icon sprite. No cards, no manifest, no helper (path is a rename per architecture note; the manifest/helper/card files themselves are still missing). |
+| `assets.md` | `web/design-system/packages/assets` (`@kaggle-environments/design-system-assets`): `src/<family>/` artwork, `families.json` roster, generated `packed/<family>/` with atlas + `manifest.json`, resolved via `pieceAsset()`/`pieceFamily()` | **Now real and complete** — the package exists, is built by AssetPack, and is consumed by the chess Pixi visualizer and the `Piece` DOM component. Four families: `chess` (12), `board` (1), `fx` (14), `card` (54). `assets.md` has been rewritten to describe what exists rather than the old aspirational `@gamecraft/assets` spec. Remaining gaps are new families (discs, dice, chips) and runtime tinting, both flagged in that doc. |
 | `visualizer-behavior.md` | Turn flow / scoring / game-end conventions, entirely in terms of the missing components (`TurnIndicator`, `ScoreValue`, `Modal`, `GameAnnouncer`) | Not implementable until those components exist. |
 | `animation.md` | Duration tokens + easing utilities (`ease-enter`, `ease-move`, `ease-spring`, `animate-stone-place`) | Duration vars mostly exist in `main.css` (though `--dur-moment` is 1300ms there vs. "≈900ms" in the doc), but none of the named easing utilities or the stone-place keyframe exist. |
 | `theming.md` | 4 override hooks (`--color-accent`, `--color-board`, `--color-board-line`, `--color-card-back`) plus a large "never override" token set (`bg-surface-*`, `fg*`, `player-1..4`, etc.) | `main.css` only defines `--color-black/white/grey/dark-grey/highlight-blue` + radii/fonts/durations. None of the theming-doc's tokens exist. |
@@ -196,10 +196,14 @@ issues, so they weren't in scope of the passes above:
   `tailwindcss@^4.3.3`. `@kaggle-environments/design-system-components`
   declares `peerDependencies: { react: ^18.0.0 }`, which `^19.0.0` violates
   outright.
-- **`assets.md` still references `@gamecraft/assets`** (`packages/assets/`
-  + a `build-manifest` script) — left alone since, same as the scaffolded
-  app's dependency above, there's no real package to rename it to; this is
-  the pre-existing `assets.md` gap, not a naming-pass miss.
+- ~~**`assets.md` still references `@gamecraft/assets`**~~ **Resolved.**
+  `@kaggle-environments/design-system-assets` now exists at
+  `web/design-system/packages/assets`, and `assets.md` was rewritten against
+  it. It is the first design-system package a *visualizer* depends on, which
+  surfaced a latent build-ordering bug: `pnpm build-all` pre-built only
+  `@kaggle-environments/core` before running visualizers under
+  `pnpm -r --parallel` (which discards topological order). `find-games.js`
+  step 1 now builds every `@kaggle-environments/design-system-*` package too.
 - **`--out` mode's exit code.** `gc-layout --out ...` exits non-zero (3,
   observed) whenever there are warnings (missing descriptions, no dense
   frame) even though it successfully writes both files — a script gating on

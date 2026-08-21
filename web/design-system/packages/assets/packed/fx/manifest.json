@@ -1,0 +1,73 @@
+{
+  "family": "fx",
+  "version": 1,
+  "description": "Generic decorative particles, shared across games.",
+  "individual": false,
+  "targets": [
+    "pixi",
+    "dom"
+  ],
+  "sourceSize": null,
+  "atlas": {
+    "image": "fx.webp",
+    "data": "fx.webp.json",
+    "size": {
+      "w": 314,
+      "h": 242
+    }
+  },
+  "pieces": {
+    "fx:puff1": {
+      "id": "fx:puff1",
+      "file": null,
+      "frame": {
+        "x": 185,
+        "y": 2,
+        "w": 127,
+        "h": 105
+      },
+      "sourceSize": {
+        "w": 127,
+        "h": 105
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "fx:puff2": {
+      "id": "fx:puff2",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 87,
+        "w": 181,
+        "h": 153
+      },
+      "sourceSize": {
+        "w": 181,
+        "h": 153
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "fx:puff3": {
+      "id": "fx:puff3",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 2,
+        "w": 99,
+        "h": 83
+      },
+      "sourceSize": {
+        "w": 99,
+        "h": 83
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    }
+  },
+  "missing": []
+}

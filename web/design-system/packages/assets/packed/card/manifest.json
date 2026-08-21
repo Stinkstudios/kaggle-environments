@@ -1,0 +1,665 @@
+{
+  "family": "card",
+  "version": 1,
+  "description": "Playing cards. 52 faces + back + joker.",
+  "individual": true,
+  "targets": [
+    "dom"
+  ],
+  "sourceSize": {
+    "w": 462,
+    "h": 643
+  },
+  "atlas": null,
+  "pieces": {
+    "card:10-club": {
+      "id": "card:10-club",
+      "file": "10-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "10 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:10-diamond": {
+      "id": "card:10-diamond",
+      "file": "10-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "10 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:10-heart": {
+      "id": "card:10-heart",
+      "file": "10-heart.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "10 of hearts",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:10-spade": {
+      "id": "card:10-spade",
+      "file": "10-spade.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "10 of spades",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:2-club": {
+      "id": "card:2-club",
+      "file": "2-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "2 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:2-diamond": {
+      "id": "card:2-diamond",
+      "file": "2-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "2 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:2-heart": {
+      "id": "card:2-heart",
+      "file": "2-heart.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "2 of hearts",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:2-spade": {
+      "id": "card:2-spade",
+      "file": "2-spade.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "2 of spades",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:3-club": {
+      "id": "card:3-club",
+      "file": "3-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "3 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:3-diamond": {
+      "id": "card:3-diamond",
+      "file": "3-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "3 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:3-heart": {
+      "id": "card:3-heart",
+      "file": "3-heart.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "3 of hearts",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:3-spade": {
+      "id": "card:3-spade",
+      "file": "3-spade.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "3 of spades",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:4-club": {
+      "id": "card:4-club",
+      "file": "4-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "4 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:4-diamond": {
+      "id": "card:4-diamond",
+      "file": "4-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "4 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:4-heart": {
+      "id": "card:4-heart",
+      "file": "4-heart.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "4 of hearts",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:4-spade": {
+      "id": "card:4-spade",
+      "file": "4-spade.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "4 of spades",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:5-club": {
+      "id": "card:5-club",
+      "file": "5-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "5 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:5-diamond": {
+      "id": "card:5-diamond",
+      "file": "5-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "5 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:5-heart": {
+      "id": "card:5-heart",
+      "file": "5-heart.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "5 of hearts",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:5-spade": {
+      "id": "card:5-spade",
+      "file": "5-spade.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "5 of spades",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:6-club": {
+      "id": "card:6-club",
+      "file": "6-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "6 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:6-diamond": {
+      "id": "card:6-diamond",
+      "file": "6-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "6 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:6-heart": {
+      "id": "card:6-heart",
+      "file": "6-heart.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "6 of hearts",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:6-spade": {
+      "id": "card:6-spade",
+      "file": "6-spade.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "6 of spades",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:7-club": {
+      "id": "card:7-club",
+      "file": "7-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "7 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:7-diamond": {
+      "id": "card:7-diamond",
+      "file": "7-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "7 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:7-heart": {
+      "id": "card:7-heart",
+      "file": "7-heart.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "7 of hearts",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:7-spade": {
+      "id": "card:7-spade",
+      "file": "7-spade.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "7 of spades",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:8-club": {
+      "id": "card:8-club",
+      "file": "8-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "8 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:8-diamond": {
+      "id": "card:8-diamond",
+      "file": "8-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "8 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:8-heart": {
+      "id": "card:8-heart",
+      "file": "8-heart.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "8 of hearts",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:8-spade": {
+      "id": "card:8-spade",
+      "file": "8-spade.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "8 of spades",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:9-club": {
+      "id": "card:9-club",
+      "file": "9-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "9 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:9-diamond": {
+      "id": "card:9-diamond",
+      "file": "9-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "9 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:9-heart": {
+      "id": "card:9-heart",
+      "file": "9-heart.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "9 of hearts",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:9-spade": {
+      "id": "card:9-spade",
+      "file": "9-spade.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "9 of spades",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:a-club": {
+      "id": "card:a-club",
+      "file": "a-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "ace of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:a-diamond": {
+      "id": "card:a-diamond",
+      "file": "a-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "ace of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:a-heart": {
+      "id": "card:a-heart",
+      "file": "a-heart.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "ace of hearts",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:a-spade": {
+      "id": "card:a-spade",
+      "file": "a-spade.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "ace of spades",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:back": {
+      "id": "card:back",
+      "file": "back.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "face-down card",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:j-club": {
+      "id": "card:j-club",
+      "file": "j-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "jack of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:j-diamond": {
+      "id": "card:j-diamond",
+      "file": "j-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "jack of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:j-heart": {
+      "id": "card:j-heart",
+      "file": "j-heart.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "jack of hearts",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:j-spade": {
+      "id": "card:j-spade",
+      "file": "j-spade.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "jack of spades",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:joker": {
+      "id": "card:joker",
+      "file": "joker.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "joker",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:k-club": {
+      "id": "card:k-club",
+      "file": "k-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "king of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:k-diamond": {
+      "id": "card:k-diamond",
+      "file": "k-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "king of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:k-heart": {
+      "id": "card:k-heart",
+      "file": "k-heart.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "king of hearts",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:k-spade": {
+      "id": "card:k-spade",
+      "file": "k-spade.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "king of spades",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:q-club": {
+      "id": "card:q-club",
+      "file": "q-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "queen of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:q-diamond": {
+      "id": "card:q-diamond",
+      "file": "q-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "queen of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:q-heart": {
+      "id": "card:q-heart",
+      "file": "q-heart.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "queen of hearts",
+      "decorative": false,
+      "tintable": false
+    },
+    "card:q-spade": {
+      "id": "card:q-spade",
+      "file": "q-spade.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "queen of spades",
+      "decorative": false,
+      "tintable": false
+    }
+  },
+  "missing": []
+}

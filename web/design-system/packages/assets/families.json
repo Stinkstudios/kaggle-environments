@@ -1,0 +1,316 @@
+{
+  "$comment": "Expected piece roster. This file \u2014 not the filesystem \u2014 is the source of truth for which pieces SHOULD exist; the build diffs it against src/ to produce each manifest's missing[] list. Declaring a piece before the artwork exists is the correct way to record a known gap. Set \"individual\": true on a family to also emit one file per piece alongside the sheet \u2014 for families like cards, where you show one face at a time and loading the whole sheet to do it would be wasteful. Default (omitted) is atlas-only: both Pixi and DOM read the single sheet.",
+  "version": 1,
+  "families": {
+    "chess": {
+      "description": "Figurative chess pieces",
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "tintable": false,
+      "pieces": {
+        "w-king": {
+          "label": "white king"
+        },
+        "w-queen": {
+          "label": "white queen"
+        },
+        "w-rook": {
+          "label": "white rook"
+        },
+        "w-bishop": {
+          "label": "white bishop"
+        },
+        "w-knight": {
+          "label": "white knight"
+        },
+        "w-pawn": {
+          "label": "white pawn"
+        },
+        "b-king": {
+          "label": "black king"
+        },
+        "b-queen": {
+          "label": "black queen"
+        },
+        "b-rook": {
+          "label": "black rook"
+        },
+        "b-bishop": {
+          "label": "black bishop"
+        },
+        "b-knight": {
+          "label": "black knight"
+        },
+        "b-pawn": {
+          "label": "black pawn"
+        }
+      },
+      "targets": [
+        "pixi",
+        "dom"
+      ]
+    },
+    "board": {
+      "description": "Board surface textures",
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      },
+      "tintable": false,
+      "pieces": {
+        "dark-tile": {
+          "label": "dark square",
+          "decorative": true
+        }
+      },
+      "targets": [
+        "pixi",
+        "dom"
+      ]
+    },
+    "fx": {
+      "description": "Generic decorative particles, shared across games.",
+      "tintable": false,
+      "targets": [
+        "pixi",
+        "dom"
+      ],
+      "$note": "Only art proven to be used by more than one game lives here. The three puffs are byte-identical between the chess and go visualizers, which is what earns them a place in a shared family.",
+      "pieces": {
+        "puff1": {
+          "decorative": true
+        },
+        "puff2": {
+          "decorative": true
+        },
+        "puff3": {
+          "decorative": true
+        }
+      }
+    },
+    "chess-fx": {
+      "description": "Chess's own motion particles. Not reusable \u2014 several are piece silhouettes.",
+      "tintable": false,
+      "targets": [
+        "pixi",
+        "dom"
+      ],
+      "$note": "Game-scoped on purpose. rook1-4, bishop1-2, pawn and knight-shadow are silhouettes of chess pieces; squiggle-1..3 are the king trail. Naming these generically would invite another game to import a rook outline as \"decoration\".",
+      "pieces": {
+        "squiggle-1": {
+          "decorative": true
+        },
+        "squiggle-2": {
+          "decorative": true
+        },
+        "squiggle-3": {
+          "decorative": true
+        },
+        "rook1": {
+          "decorative": true
+        },
+        "rook2": {
+          "decorative": true
+        },
+        "rook3": {
+          "decorative": true
+        },
+        "rook4": {
+          "decorative": true
+        },
+        "bishop1": {
+          "decorative": true
+        },
+        "bishop2": {
+          "decorative": true
+        },
+        "pawn": {
+          "decorative": true
+        },
+        "knight-shadow": {
+          "decorative": true
+        }
+      }
+    },
+    "card": {
+      "description": "Playing cards. 52 faces + back + joker.",
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "tintable": false,
+      "individual": true,
+      "atlas": false,
+      "$note": "targets:[\"dom\"] + atlas:false \u2014 every card game here (gin_rummy, bridge_arena, repeated_poker) is DOM and shows a hand at a time, so per-card files are the right shape. If a Pixi card game ever appears, add \"pixi\" to targets and set atlas:true: all 54 fit one 4096 sheet at 419x583 (9x7=63 slots, 91% of source), so this is a downscale decision, not a multi-page one.",
+      "pieces": {
+        "a-spade": {
+          "label": "ace of spades"
+        },
+        "2-spade": {
+          "label": "2 of spades"
+        },
+        "3-spade": {
+          "label": "3 of spades"
+        },
+        "4-spade": {
+          "label": "4 of spades"
+        },
+        "5-spade": {
+          "label": "5 of spades"
+        },
+        "6-spade": {
+          "label": "6 of spades"
+        },
+        "7-spade": {
+          "label": "7 of spades"
+        },
+        "8-spade": {
+          "label": "8 of spades"
+        },
+        "9-spade": {
+          "label": "9 of spades"
+        },
+        "10-spade": {
+          "label": "10 of spades"
+        },
+        "j-spade": {
+          "label": "jack of spades"
+        },
+        "q-spade": {
+          "label": "queen of spades"
+        },
+        "k-spade": {
+          "label": "king of spades"
+        },
+        "a-heart": {
+          "label": "ace of hearts"
+        },
+        "2-heart": {
+          "label": "2 of hearts"
+        },
+        "3-heart": {
+          "label": "3 of hearts"
+        },
+        "4-heart": {
+          "label": "4 of hearts"
+        },
+        "5-heart": {
+          "label": "5 of hearts"
+        },
+        "6-heart": {
+          "label": "6 of hearts"
+        },
+        "7-heart": {
+          "label": "7 of hearts"
+        },
+        "8-heart": {
+          "label": "8 of hearts"
+        },
+        "9-heart": {
+          "label": "9 of hearts"
+        },
+        "10-heart": {
+          "label": "10 of hearts"
+        },
+        "j-heart": {
+          "label": "jack of hearts"
+        },
+        "q-heart": {
+          "label": "queen of hearts"
+        },
+        "k-heart": {
+          "label": "king of hearts"
+        },
+        "a-diamond": {
+          "label": "ace of diamonds"
+        },
+        "2-diamond": {
+          "label": "2 of diamonds"
+        },
+        "3-diamond": {
+          "label": "3 of diamonds"
+        },
+        "4-diamond": {
+          "label": "4 of diamonds"
+        },
+        "5-diamond": {
+          "label": "5 of diamonds"
+        },
+        "6-diamond": {
+          "label": "6 of diamonds"
+        },
+        "7-diamond": {
+          "label": "7 of diamonds"
+        },
+        "8-diamond": {
+          "label": "8 of diamonds"
+        },
+        "9-diamond": {
+          "label": "9 of diamonds"
+        },
+        "10-diamond": {
+          "label": "10 of diamonds"
+        },
+        "j-diamond": {
+          "label": "jack of diamonds"
+        },
+        "q-diamond": {
+          "label": "queen of diamonds"
+        },
+        "k-diamond": {
+          "label": "king of diamonds"
+        },
+        "a-club": {
+          "label": "ace of clubs"
+        },
+        "2-club": {
+          "label": "2 of clubs"
+        },
+        "3-club": {
+          "label": "3 of clubs"
+        },
+        "4-club": {
+          "label": "4 of clubs"
+        },
+        "5-club": {
+          "label": "5 of clubs"
+        },
+        "6-club": {
+          "label": "6 of clubs"
+        },
+        "7-club": {
+          "label": "7 of clubs"
+        },
+        "8-club": {
+          "label": "8 of clubs"
+        },
+        "9-club": {
+          "label": "9 of clubs"
+        },
+        "10-club": {
+          "label": "10 of clubs"
+        },
+        "j-club": {
+          "label": "jack of clubs"
+        },
+        "q-club": {
+          "label": "queen of clubs"
+        },
+        "k-club": {
+          "label": "king of clubs"
+        },
+        "back": {
+          "label": "face-down card"
+        },
+        "joker": {
+          "label": "joker"
+        }
+      },
+      "targets": [
+        "dom"
+      ]
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "family": "board",
+  "version": 1,
+  "description": "Board surface textures",
+  "individual": false,
+  "targets": [
+    "pixi",
+    "dom"
+  ],
+  "sourceSize": {
+    "w": 128,
+    "h": 128
+  },
+  "atlas": {
+    "image": "board.webp",
+    "data": "board.webp.json",
+    "size": {
+      "w": 132,
+      "h": 132
+    }
+  },
+  "pieces": {
+    "board:dark-tile": {
+      "id": "board:dark-tile",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 2,
+        "w": 128,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    }
+  },
+  "missing": []
+}
