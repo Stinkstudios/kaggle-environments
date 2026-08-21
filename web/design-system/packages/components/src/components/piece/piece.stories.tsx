@@ -103,6 +103,24 @@ export const ChessSet: Story = {
 };
 
 /**
+ * The go family: two stones, the marker and territory marks that carry meaning,
+ * and the board furniture that doesn't. Sizes are deliberately mixed — a 256px
+ * stone next to a 74x4 grid line — so `size="auto"` is what keeps each honest.
+ */
+export const GoSet: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-end gap-6">
+      {pieceIds('go').map((id) => (
+        <div key={id} className="flex flex-col items-center gap-2">
+          <Piece id={id} size="auto" className="h-16" />
+          <span className="text-xs">{id.split(':')[1]}</span>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+/**
  * Decorative art: `alt=""` + `aria-hidden`, never announced. These frames are
  * deliberately non-square (`fx:pawn` is 18x96) — they should keep their shape,
  * not stretch.

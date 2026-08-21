@@ -1,5 +1,6 @@
-import { Container, Sprite, Text, TextStyle, TilingSprite, type Spritesheet } from 'pixi.js';
-import { BOARD_PADDING, BOARD_PX, getStarPoints, getCellSize, gridToPixel } from './constants';
+import { Container, Sprite, Text, TextStyle, TilingSprite } from 'pixi.js';
+import { BOARD_PADDING, BOARD_PX, GRID_LINE_ID, HOSHI_ID, getStarPoints, getCellSize, gridToPixel } from './constants';
+import type { TextureMap } from './textures';
 
 const HOSHI_SIZE_RATIO = 0.25;
 
@@ -9,12 +10,12 @@ const LABEL_MAX_FONT_SIZE = 11;
 const LABEL_FONT_SIZE_RATIO = 0.38;
 const LABEL_OFFSET_RATIO = 0.45;
 
-export function drawBoard(boardSize: number, sheet: Spritesheet): Container {
+export function drawBoard(boardSize: number, textures: TextureMap): Container {
   const container = new Container();
   const cell = getCellSize(boardSize);
 
   const gridSpan = (boardSize - 1) * cell;
-  const lineTexture = sheet.textures['squiggle-dash.png'];
+  const lineTexture = textures[GRID_LINE_ID];
   const lineHeight = lineTexture.height / 2;
 
   for (let row = 0; row < boardSize; row++) {
@@ -52,7 +53,7 @@ export function drawBoard(boardSize: number, sheet: Spritesheet): Container {
   const hoshiSize = cell * HOSHI_SIZE_RATIO;
   for (const [row, col] of getStarPoints(boardSize)) {
     const { x, y } = gridToPixel(row, col, boardSize);
-    const hoshi = new Sprite(sheet.textures['hoshi.png']);
+    const hoshi = new Sprite(textures[HOSHI_ID]);
     hoshi.anchor.set(0.5);
     hoshi.position.set(x, y);
     hoshi.width = hoshiSize;

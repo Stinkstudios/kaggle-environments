@@ -1,7 +1,7 @@
-import { Application, Assets, Container, Spritesheet } from 'pixi.js';
+import { Application, Container } from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import type { CellValue, GridPos, Territory } from '../types/game';
-import { BOARD_PX, getCellSize, getNeighbors, gridToPixel } from './constants';
+import { BOARD_PX, getCellSize, getNeighbors, gridToPixel, territoryId } from './constants';
 import { drawBoard } from './drawBoard';
 import { diffGrids } from './diffGrids';
 import { createStonePair, posKey, resetPair, type StoneMap } from './stoneMap';
@@ -14,9 +14,8 @@ import {
   animateTerritoryOut,
 } from './animateStones.ts';
 import { Marker } from './marker.ts';
+import { loadGameTextures, type TextureMap } from './textures';
 import usePreloader from '../stores/usePreloader';
-import spritesData from '../assets/sprites/sprites.json';
-import spritesPng from '../assets/sprites/sprites.png';
 
 export interface GoPixiProps {
   grid: CellValue[][];
@@ -32,7 +31,7 @@ export class GoPixi {
   private boardSize: number;
   private container: HTMLElement;
 
-  private sheet: Spritesheet | null = null;
+  private textures: TextureMap | null = null;
   private layers: { shadow: Container; territory: Container; stone: Container; effects: Container } | null = null;
   private marker: Marker | null = null;
 
@@ -84,20 +83,17 @@ export class GoPixi {
     app.canvas.style.removeProperty('touch-action');
     this.container.appendChild(app.canvas);
 
-    const texture = await Assets.load(spritesPng);
-    texture.source.autoGenerateMipmaps = true;
-    const sheet = new Spritesheet(texture, spritesData);
-    await sheet.parse();
+    const textures = await loadGameTextures();
 
     if (this.destroyed) {
       app.destroy(true, { children: true });
       return;
     }
 
-    this.sheet = sheet;
+    this.textures = textures;
 
     await document.fonts.load('11px "Inter"');
-    app.stage.addChild(drawBoard(boardSize, sheet));
+    app.stage.addChild(drawBoard(boardSize, textures));
 
     // Layer setup
     const shadowLayer = new Container();
@@ -111,7 +107,7 @@ export class GoPixi {
     this.layers = { shadow: shadowLayer, territory: territoryLayer, stone: stoneLayer, effects: effectsLayer };
 
     // Active-move marker
-    this.marker = new Marker(sheet, stoneLayer, boardSize);
+    this.marker = new Marker(textures, stoneLayer, boardSize);
 
     this.initialized = true;
     usePreloader.getState().setPixiReady();
@@ -152,13 +148,13 @@ export class GoPixi {
     }
   }
 
-  private updateTerritory(territory: Territory, isSingleStep: boolean, sheet: Spritesheet, layer: Container): void {
+  private updateTerritory(territory: Territory, isSingleStep: boolean, textures: TextureMap, layer: Container): void {
     const size = getCellSize(this.boardSize) * 0.3;
 
-    // Build desired state: key → { row, col, texName }
+    // Build desired state: key → { row, col, asset id }
     const next = new Map<string, { row: number; col: number; tex: string }>();
-    for (const { row, col } of territory.black) next.set(posKey(row, col), { row, col, tex: 'black-territory.png' });
-    for (const { row, col } of territory.white) next.set(posKey(row, col), { row, col, tex: 'white-territory.png' });
+    for (const { row, col } of territory.black) next.set(posKey(row, col), { row, col, tex: territoryId('B') });
+    for (const { row, col } of territory.white) next.set(posKey(row, col), { row, col, tex: territoryId('W') });
 
     // Remove sprites that are gone or changed color
     for (const [key, { tex }] of this.prevTerritoryMap) {
@@ -177,7 +173,7 @@ export class GoPixi {
     // Add sprites that are new or changed color
     for (const [key, { row, col, tex }] of next) {
       if (this.prevTerritoryMap.get(key)?.tex === tex) continue;
-      const sprite = new Sprite(sheet.textures[tex]);
+      const sprite = new Sprite(textures[tex]);
       sprite.anchor.set(0.5);
       const pos = gridToPixel(row, col, this.boardSize);
       sprite.position.set(pos.x, pos.y);
@@ -196,13 +192,13 @@ export class GoPixi {
   }
 
   update(props: GoPixiProps): void {
-    if (!this.initialized || !this.sheet || !this.layers || !this.marker) {
+    if (!this.initialized || !this.textures || !this.layers || !this.marker) {
       this.pendingProps = props;
       return;
     }
 
     const { grid, step, lastPlayed, atari, territory, reducedMotion } = props;
-    const { sheet, layers, marker, boardSize } = this;
+    const { textures, layers, marker, boardSize } = this;
 
     this.resetScene();
 
@@ -220,7 +216,7 @@ export class GoPixi {
         if (isSingleStep) {
           layers.effects.addChild(pair.shadow);
           layers.effects.addChild(pair.stone);
-          this.activeAnims.push(animateCapture(pair, sheet, layers.effects));
+          this.activeAnims.push(animateCapture(pair, textures, layers.effects));
         } else {
           pair.shadow.destroy();
           pair.stone.destroy();
@@ -230,7 +226,7 @@ export class GoPixi {
 
     // Add new stones
     for (const { row, col, value } of added) {
-      const pair = createStonePair(row, col, value, boardSize, sheet);
+      const pair = createStonePair(row, col, value, boardSize, textures);
       layers.shadow.addChild(pair.shadow);
       layers.stone.addChild(pair.stone);
       this.stoneMap.set(posKey(row, col), pair);
@@ -248,7 +244,7 @@ export class GoPixi {
     }
 
     this.activeAnims.push(...marker.update(lastPlayed, this.stoneMap, isSingleStep));
-    this.updateTerritory(territory, isSingleStep, sheet, layers.territory);
+    this.updateTerritory(territory, isSingleStep, textures, layers.territory);
 
     // Wobble stones in atari (tracked separately — these loop infinitely)
     if (!reducedMotion) {
@@ -272,7 +268,7 @@ export class GoPixi {
     this.territorySprites = new Map();
     this.prevGrid = null;
     this.pendingProps = null;
-    this.sheet = null;
+    this.textures = null;
     this.layers = null;
     this.marker = null;
     if (this.initialized) {

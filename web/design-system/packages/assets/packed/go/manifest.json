@@ -1,0 +1,175 @@
+{
+  "family": "go",
+  "version": 1,
+  "description": "Go stones, board furniture and territory overlays",
+  "individual": false,
+  "targets": [
+    "pixi",
+    "dom"
+  ],
+  "sourceSize": null,
+  "atlas": {
+    "image": "go.webp",
+    "data": "go.webp.json",
+    "size": {
+      "w": 476,
+      "h": 608
+    }
+  },
+  "pieces": {
+    "go:b-marker": {
+      "id": "go:b-marker",
+      "file": null,
+      "frame": {
+        "x": 92,
+        "y": 260,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "label": "black's last move",
+      "decorative": false,
+      "tintable": false
+    },
+    "go:b-stone": {
+      "id": "go:b-stone",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 350,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "label": "black stone",
+      "decorative": false,
+      "tintable": false
+    },
+    "go:b-territory": {
+      "id": "go:b-territory",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 144,
+        "w": 84,
+        "h": 84
+      },
+      "sourceSize": {
+        "w": 84,
+        "h": 84
+      },
+      "label": "black territory",
+      "decorative": false,
+      "tintable": false
+    },
+    "go:grid-line": {
+      "id": "go:grid-line",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 138,
+        "w": 74,
+        "h": 4
+      },
+      "sourceSize": {
+        "w": 74,
+        "h": 4
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "go:hoshi": {
+      "id": "go:hoshi",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 88,
+        "w": 48,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 48
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "go:shadow": {
+      "id": "go:shadow",
+      "file": null,
+      "frame": {
+        "x": 346,
+        "y": 2,
+        "w": 128,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "go:w-marker": {
+      "id": "go:w-marker",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 260,
+        "w": 88,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 88
+      },
+      "label": "white's last move",
+      "decorative": false,
+      "tintable": false
+    },
+    "go:w-stone": {
+      "id": "go:w-stone",
+      "file": null,
+      "frame": {
+        "x": 88,
+        "y": 2,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "label": "white stone",
+      "decorative": false,
+      "tintable": false
+    },
+    "go:w-territory": {
+      "id": "go:w-territory",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 2,
+        "w": 84,
+        "h": 84
+      },
+      "sourceSize": {
+        "w": 84,
+        "h": 84
+      },
+      "label": "white territory",
+      "decorative": false,
+      "tintable": false
+    }
+  },
+  "missing": []
+}

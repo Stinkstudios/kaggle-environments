@@ -1,7 +1,6 @@
 import { Assets, Sprite, Spritesheet, type SpritesheetData, type Texture } from 'pixi.js';
 import { Chess } from 'chess.js';
 import { animate, AnimationOptions } from 'motion';
-import { pieceFamily } from '@kaggle-environments/design-system-assets';
 import type { Engine } from '../engine';
 import { squareToPixel } from '../coordinates';
 import { ASSET_FAMILIES, pieceId } from '../constants';
@@ -21,9 +20,7 @@ export async function loadGameTextures(): Promise<Record<string, Texture>> {
   const textures: Record<string, Texture> = {};
 
   await Promise.all(
-    ASSET_FAMILIES.map(async (family) => {
-      const { atlasUrl, atlasData, pieces, missing, targets } = pieceFamily(family);
-
+    ASSET_FAMILIES.map(async ({ family, atlasUrl, atlasData, pieces, missing, targets }) => {
       // An atlas-less family (one built for DOM only, like cards) has nothing
       // Pixi can load. Silently skipping it renders an empty board with no
       // clue why, so say what's wrong and how to fix it.

@@ -1,6 +1,8 @@
 import gsap from 'gsap';
-import { Sprite, type Container, type Spritesheet } from 'pixi.js';
+import { Sprite, type Container } from 'pixi.js';
+import { PUFF_IDS } from './constants';
 import type { StonePair } from './stoneMap';
+import type { TextureMap } from './textures';
 
 // Drop animation
 const DROP_SCALE = 1.5;
@@ -128,9 +130,7 @@ export function animateStoneDrop(pair: StonePair): gsap.core.Timeline {
   return tl;
 }
 
-const PUFF_TEXTURES = ['puff1.png', 'puff2.png', 'puff3.png'] as const;
-
-export function animateCapture(pair: StonePair, sheet: Spritesheet, effectsLayer: Container): gsap.core.Timeline {
+export function animateCapture(pair: StonePair, textures: TextureMap, effectsLayer: Container): gsap.core.Timeline {
   const tl = gsap.timeline();
   const { stone, shadow, stoneRest } = pair;
   const particles: Sprite[] = [];
@@ -183,8 +183,8 @@ export function animateCapture(pair: StonePair, sheet: Spritesheet, effectsLayer
 
   // Spawn puff particles
   for (let i = 0; i < CAPTURE_PARTICLE_COUNT; i++) {
-    const texName = PUFF_TEXTURES[Math.floor(Math.random() * PUFF_TEXTURES.length)];
-    const puff = new Sprite(sheet.textures[texName]);
+    const puffId = PUFF_IDS[Math.floor(Math.random() * PUFF_IDS.length)];
+    const puff = new Sprite(textures[puffId]);
     puff.anchor.set(0.5);
     puff.position.set(stoneRest.x, stoneRest.y);
     puff.scale.set(0);

@@ -33,6 +33,35 @@ import { Piece } from '@kaggle-environments/design-system-components';
 <Piece id="card:a-spade" size="lg" />
 ```
 
+## Import the families you draw, not the package root
+
+**A Pixi game imports per family. Always.**
+
+```ts
+import goFamily from '@kaggle-environments/design-system-assets/go';
+import fxFamily from '@kaggle-environments/design-system-assets/fx';
+```
+
+The package root is a barrel over every family. It exists for consumers that
+genuinely resolve arbitrary ids — the DOM `<Piece>` component and the Storybook
+gallery — and it cannot be tree-shaken: one module holds static imports of every
+atlas and all 54 card faces, referenced from a single object literal, so a
+bundler must keep the lot. Importing `pieceFamily` from the root once put 1.28MB
+of artwork into the go visualizer, 1.16MB of it the playing-card deck, for a
+board that draws nine sprites.
+
+Filtering at runtime does not help. A list of family names controls what gets
+*loaded into Pixi*; the bundle is decided by what gets *imported*. Naming each
+family as an import is what makes the two agree — and makes the cost visible in
+the diff when someone adds a family to a game.
+
+Each per-family module default-exports a ready `FamilyInfo` (atlas, pieces,
+`missing[]`), so there is nothing to resolve by name:
+
+```ts
+const { atlasUrl, atlasData, pieces, missing } = goFamily;
+```
+
 ## Families
 
 | Family | ids | Output | Notes |
@@ -41,6 +70,7 @@ import { Piece } from '@kaggle-environments/design-system-components';
 | `board` | `board:dark-tile` | atlas | 128×128 |
 | `fx` | `fx:puff1-3` | atlas | shared decorative particles |
 | `chess-fx` | `chess-fx:{squiggle-1-3,rook1-4,bishop1-2,pawn,knight-shadow}` | atlas | chess-only, game-scoped |
+| `go` | `go:{b,w}-{stone,marker,territory}`, `go:{shadow,hoshi,grid-line}` | atlas | go-only, game-scoped; mixed sizes |
 | `card` | `card:<rank>-<suit>`, `card:back`, `card:joker` | individual | 462×643, 54 pieces — **artwork not yet added** |
 
 Card ids: rank `a, 2…10, j, q, k` (`10`, not `t`); suit singular lowercase
@@ -68,7 +98,7 @@ an atlas-less family — the build **refuses** `targets: ["pixi"]` with
 
 | Family | Output | Targets |
 | --- | --- | --- |
-| `chess`, `board`, `fx`, `chess-fx` | atlas | pixi + dom |
+| `chess`, `board`, `fx`, `chess-fx`, `go` | atlas | pixi + dom |
 | `card` | individual | dom |
 
 Cards are DOM-only because every card game here is DOM and shows a hand at a
@@ -84,7 +114,8 @@ A family in this package is a claim that its art is **reusable**. Art that only
 one game uses gets a game-scoped family name — `chess-fx`, not `fx`.
 
 The test is evidence, not intent: the three `fx` puffs are byte-identical
-between the chess and go visualizers, which is what earns them a shared family.
+between the chess and go visualizers, which is what earns them a shared family —
+and both now load them from `fx` rather than each carrying its own copy.
 Everything else chess uses for motion (`rook1-4`, `bishop1-2`, `pawn`,
 `knight-shadow`, `squiggle-1..3`) lives in `chess-fx`, because several of those
 are literally chess piece silhouettes — filing them under a generic `fx` invites
@@ -95,6 +126,8 @@ anticipation that it might.
 
 ## Rules
 
+- Pixi games import `@kaggle-environments/design-system-assets/<family>`. The
+  package root is DOM-only — it bundles every family.
 - Resolve through `pieceAsset()`/`pieceFamily()`, never by guessing file paths.
 - Returns `null` → no asset yet. Pass it through (`<Piece>` renders its
   `fallback`); report the gap from the manifest's `missing[]`. Don't fake it,
@@ -124,6 +157,7 @@ pnpm --filter @kaggle-environments/design-system-assets check:roster   # no deps
 | `board` | complete — 1 tile, atlas |
 | `fx` | complete — 3 shared puffs, atlas |
 | `chess-fx` | complete — 11 chess-only particles, atlas |
+| `go` | complete — 9 go-only pieces, atlas |
 | `card` | complete — 54 faces, individual files, DOM-only |
 
 Runtime tinting is not implemented; no `tintable` family exists yet. It lands
@@ -136,14 +170,16 @@ per unit of design effort:
 
 | Family | Games it would serve |
 | --- | --- |
-| **discs / stones** | go, othello, connect_four, checkers, clobber, nine_mens_morris, y, havannah, dark_hex, coin_game, coin_game_arena |
+| **discs / stones** | othello, connect_four, checkers, clobber, nine_mens_morris, y, havannah, dark_hex, coin_game, coin_game_arena |
 | **figurative** | amazons, breakthrough, lines_of_action, quoridor (chess already done) |
 | **glyph tiles** | shogi (kanji), hive (hex bug tiles), dots_and_boxes |
 | **dice** | backgammon |
 | **chips / seeds** | repeated_poker, oshi_zumo, mancala |
 
 Discs are far and away the best first move — one tintable disc plus a colour
-token replaces hand-rolled `ctx.arc` drawing in about ten games. Agent and unit
+token replaces hand-rolled `ctx.arc` drawing in about ten games. Go is off that
+list: its stones are figurative, individually-shaded artwork rather than flat
+discs, so they stay in the game-scoped `go` family even once discs exist. Agent and unit
 sprites (snake, markov_soccer, capture_the_flag, ant_foraging, lux_*, halite,
 kore_fleets) are deliberately out of scope: they're per-game characters, not
 reusable pieces.

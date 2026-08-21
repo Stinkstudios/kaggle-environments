@@ -23,26 +23,36 @@
  *   node scripts/build-assets.mjs --check   roster diff only, no packing, no deps
  *   node scripts/build-assets.mjs --no-pack rebuild manifests from existing output
  */
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync, rmSync, cpSync, copyFileSync, statSync } from 'node:fs';
-import { join, dirname, basename, extname, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import {
+  readFileSync,
+  writeFileSync,
+  mkdirSync,
+  readdirSync,
+  existsSync,
+  rmSync,
+  cpSync,
+  copyFileSync,
+  statSync,
+} from "node:fs";
+import { join, dirname, basename, extname, sep } from "node:path";
+import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const PKG = join(HERE, '..');
-const SRC = join(PKG, 'src');
+const PKG = join(HERE, "..");
+const SRC = join(PKG, "src");
 /** Packer scratch: staging tree in, raw packer output out. Never committed. */
-const WORK = join(PKG, '.packer-work');
-const STAGING = join(WORK, 'staging');
-const RAW = join(WORK, 'out');
+const WORK = join(PKG, ".packer-work");
+const STAGING = join(WORK, "staging");
+const RAW = join(WORK, "out");
 /** The committed build output. */
-const PACKED = join(PKG, 'packed');
+const PACKED = join(PKG, "packed");
 /** Generated TS, inside src/ so tsc's rootDir stays ./src. */
-const GENERATED = join(SRC, 'generated');
+const GENERATED = join(SRC, "generated");
 
-const checkOnly = process.argv.includes('--check');
-const noPack = process.argv.includes('--no-pack');
-const config = JSON.parse(readFileSync(join(PKG, 'families.json'), 'utf8'));
+const checkOnly = process.argv.includes("--check");
+const noPack = process.argv.includes("--no-pack");
+const config = JSON.parse(readFileSync(join(PKG, "families.json"), "utf8"));
 
 function walk(dir, out = []) {
   if (!existsSync(dir)) return out;
@@ -64,7 +74,7 @@ const wantsIndividual = (spec) => Boolean(spec.individual);
  */
 const wantsAtlas = (spec) => spec.atlas !== false;
 /** Renderers this family promises to serve. Defaults to both. */
-const targetsOf = (spec) => spec.targets ?? ['pixi', 'dom'];
+const targetsOf = (spec) => spec.targets ?? ["pixi", "dom"];
 
 /**
  * Read a PNG's dimensions straight from the IHDR chunk — no image library, so
@@ -73,7 +83,7 @@ const targetsOf = (spec) => spec.targets ?? ['pixi', 'dom'];
  */
 function pngSize(file) {
   const b = readFileSync(file);
-  if (b.length < 24 || b.toString('ascii', 12, 16) !== 'IHDR') return null;
+  if (b.length < 24 || b.toString("ascii", 12, 16) !== "IHDR") return null;
   return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
 }
 
@@ -85,7 +95,9 @@ function audit() {
   for (const [family, spec] of Object.entries(config.families)) {
     const dir = join(SRC, family);
     const onDisk = existsSync(dir)
-      ? readdirSync(dir).filter((f) => extname(f) === '.png').map((f) => basename(f, '.png'))
+      ? readdirSync(dir)
+          .filter((f) => extname(f) === ".png")
+          .map((f) => basename(f, ".png"))
       : [];
     const declared = Object.keys(spec.pieces);
     const a = {
@@ -96,13 +108,20 @@ function audit() {
     };
     results[family] = a;
     unlisted += a.unlisted.length;
-    const gap = a.missing.length ? `, ${a.missing.length} missing: ${a.missing.join(', ')}` : '';
-    const bad = a.unlisted.length ? `, ${a.unlisted.length} UNDECLARED: ${a.unlisted.join(', ')}` : '';
-    const mode = [wantsAtlas(spec) && 'atlas', wantsIndividual(spec) && 'individual']
-      .filter(Boolean)
-      .join(' + ') || 'NOTHING';
-    const tgt = targetsOf(spec).join('/');
-    console.log(`  ${family}: ${a.onDisk.length}/${a.declared.length} present [${mode} → ${tgt}]${gap}${bad}`);
+    const gap = a.missing.length
+      ? `, ${a.missing.length} missing: ${a.missing.join(", ")}`
+      : "";
+    const bad = a.unlisted.length
+      ? `, ${a.unlisted.length} UNDECLARED: ${a.unlisted.join(", ")}`
+      : "";
+    const mode =
+      [wantsAtlas(spec) && "atlas", wantsIndividual(spec) && "individual"]
+        .filter(Boolean)
+        .join(" + ") || "NOTHING";
+    const tgt = targetsOf(spec).join("/");
+    console.log(
+      `  ${family}: ${a.onDisk.length}/${a.declared.length} present [${mode} → ${tgt}]${gap}${bad}`,
+    );
   }
   // A family with a declared sourceSize is promising a fixed ratio — components
   // fit artwork to it rather than stretching. One odd-sized file renders at a
@@ -114,15 +133,19 @@ function audit() {
     for (const id of results[family].onDisk) {
       const got = pngSize(join(SRC, family, `${id}.png`));
       if (got && (got.w !== spec.sourceSize.w || got.h !== spec.sourceSize.h)) {
-        wrongSize.push(`${family}:${id} is ${got.w}x${got.h}, family declares ${spec.sourceSize.w}x${spec.sourceSize.h}`);
+        wrongSize.push(
+          `${family}:${id} is ${got.w}x${got.h}, family declares ${spec.sourceSize.w}x${spec.sourceSize.h}`,
+        );
       }
     }
   }
   if (wrongSize.length) {
-    console.error(`\nERROR: ${wrongSize.length} file(s) do not match their family's declared sourceSize:`);
+    console.error(
+      `\nERROR: ${wrongSize.length} file(s) do not match their family's declared sourceSize:`,
+    );
     for (const w of wrongSize) console.error(`  - ${w}`);
     console.error(
-      `\nRe-export at the declared size (do not trim or auto-crop), or change sourceSize in families.json.`
+      `\nRe-export at the declared size (do not trim or auto-crop), or change sourceSize in families.json.`,
     );
     process.exit(1);
   }
@@ -133,13 +156,20 @@ function audit() {
   const badTargets = [];
   for (const [family, spec] of Object.entries(config.families)) {
     const t = targetsOf(spec);
-    if (t.includes('pixi') && !wantsAtlas(spec)) {
-      badTargets.push(`${family}: targets include "pixi" but atlas is false — Pixi needs a sheet`);
+    if (t.includes("pixi") && !wantsAtlas(spec)) {
+      badTargets.push(
+        `${family}: targets include "pixi" but atlas is false — Pixi needs a sheet`,
+      );
     }
-    if (!t.length) badTargets.push(`${family}: targets is empty — name at least one of "pixi", "dom"`);
+    if (!t.length)
+      badTargets.push(
+        `${family}: targets is empty — name at least one of "pixi", "dom"`,
+      );
   }
   if (badTargets.length) {
-    console.error(`\nERROR: ${badTargets.length} family target contract(s) unsatisfiable:`);
+    console.error(
+      `\nERROR: ${badTargets.length} family target contract(s) unsatisfiable:`,
+    );
     for (const t of badTargets) console.error(`  - ${t}`);
     process.exit(1);
   }
@@ -149,8 +179,8 @@ function audit() {
     .map(([f]) => f);
   if (noOutput.length) {
     console.error(
-      `\nERROR: ${noOutput.join(', ')} would emit nothing — a family needs at least one of ` +
-        `"atlas" (default true) or "individual": true.`
+      `\nERROR: ${noOutput.join(", ")} would emit nothing — a family needs at least one of ` +
+        `"atlas" (default true) or "individual": true.`,
     );
     process.exit(1);
   }
@@ -158,7 +188,7 @@ function audit() {
   if (unlisted) {
     console.error(
       `\nERROR: ${unlisted} file(s) on disk are not declared in families.json.\n` +
-        `Every piece needs a declared id + label before it can ship — add them and re-run.`
+        `Every piece needs a declared id + label before it can ship — add them and re-run.`,
     );
     process.exit(1);
   }
@@ -168,9 +198,18 @@ function audit() {
 /** ---- Packer adapter --------------------------------------------------- */
 
 function packerBin() {
-  const local = join(PKG, 'node_modules', '.bin', 'assetpack');
+  const local = join(PKG, "node_modules", ".bin", "assetpack");
   if (existsSync(local)) return local;
-  const root = join(PKG, '..', '..', '..', '..', 'node_modules', '.bin', 'assetpack');
+  const root = join(
+    PKG,
+    "..",
+    "..",
+    "..",
+    "..",
+    "node_modules",
+    ".bin",
+    "assetpack",
+  );
   return existsSync(root) ? root : null;
 }
 
@@ -186,12 +225,12 @@ function stageForPacker() {
     const from = join(SRC, family);
     if (!existsSync(from)) continue;
     if (wantsAtlas(spec)) {
-      const atlasDir = join(STAGING, 'atlas', `${family}{tps}`);
+      const atlasDir = join(STAGING, "atlas", `${family}{tps}`);
       mkdirSync(atlasDir, { recursive: true });
       cpSync(from, atlasDir, { recursive: true });
     }
     if (wantsIndividual(spec)) {
-      const singleDir = join(STAGING, 'single', family);
+      const singleDir = join(STAGING, "single", family);
       mkdirSync(singleDir, { recursive: true });
       cpSync(from, singleDir, { recursive: true });
     }
@@ -202,16 +241,19 @@ function runPacker() {
   const bin = packerBin();
   if (!bin) {
     console.error(
-      '\nERROR: AssetPack is not installed.\n' +
-        '  pnpm add -D @assetpack/core --filter @kaggle-environments/design-system-assets\n' +
-        'Then re-run. (Use --check to audit the roster without packing.)'
+      "\nERROR: AssetPack is not installed.\n" +
+        "  pnpm add -D @assetpack/core --filter @kaggle-environments/design-system-assets\n" +
+        "Then re-run. (Use --check to audit the roster without packing.)",
     );
     process.exit(1);
   }
   stageForPacker();
-  const res = spawnSync(bin, ['--config', join(PKG, 'assetpack.config.mjs')], { cwd: PKG, stdio: 'inherit' });
+  const res = spawnSync(bin, ["--config", join(PKG, "assetpack.config.mjs")], {
+    cwd: PKG,
+    stdio: "inherit",
+  });
   if (res.status !== 0) {
-    console.error('\nERROR: packer exited with status ' + res.status);
+    console.error("\nERROR: packer exited with status " + res.status);
     process.exit(res.status ?? 1);
   }
 }
@@ -220,24 +262,41 @@ function readPackerOutput(family) {
   const all = walk(RAW);
 
   const atlasPath = all
-    .filter((f) => f.endsWith('.json'))
-    .filter((f) => basename(f).replace(/\.(webp|png)\.json$/, '').replace(/\.json$/, '') === family)
+    .filter((f) => f.endsWith(".json"))
+    .filter(
+      (f) =>
+        basename(f)
+          .replace(/\.(webp|png)\.json$/, "")
+          .replace(/\.json$/, "") === family,
+    )
     .filter((f) => {
-      try { return Boolean(JSON.parse(readFileSync(f, 'utf8')).frames); } catch { return false; }
+      try {
+        return Boolean(JSON.parse(readFileSync(f, "utf8")).frames);
+      } catch {
+        return false;
+      }
     })
     .sort((a, b) => a.length - b.length)[0];
 
-  const singles = all.filter((f) => f.endsWith('.webp') && f.includes(`${sep}single${sep}${family}${sep}`));
+  const singles = all.filter(
+    (f) =>
+      f.endsWith(".webp") && f.includes(`${sep}single${sep}${family}${sep}`),
+  );
   if (!atlasPath) return { atlas: null, singles };
 
-  const raw = JSON.parse(readFileSync(atlasPath, 'utf8'));
+  const raw = JSON.parse(readFileSync(atlasPath, "utf8"));
   const frames = {};
   for (const [name, f] of Object.entries(raw.frames ?? {})) {
-    frames[basename(name, extname(name))] = { x: f.frame.x, y: f.frame.y, w: f.frame.w, h: f.frame.h };
+    frames[basename(name, extname(name))] = {
+      x: f.frame.x,
+      y: f.frame.y,
+      w: f.frame.w,
+      h: f.frame.h,
+    };
   }
   return {
     atlas: {
-      image: raw.meta?.image ?? basename(atlasPath).replace(/\.json$/, ''),
+      image: raw.meta?.image ?? basename(atlasPath).replace(/\.json$/, ""),
       data: basename(atlasPath),
       dir: dirname(atlasPath),
       path: atlasPath,
@@ -266,7 +325,7 @@ function buildManifest(family, spec, a, packed) {
       sourceSize: packed.atlas?.frames[id]
         ? { w: packed.atlas.frames[id].w, h: packed.atlas.frames[id].h }
         : (spec.sourceSize ?? null),
-      label: meta.decorative ? '' : (meta.label ?? id.replace(/-/g, ' ')),
+      label: meta.decorative ? "" : (meta.label ?? id.replace(/-/g, " ")),
       decorative: Boolean(meta.decorative),
       tintable: Boolean(meta.tintable ?? spec.tintable),
     };
@@ -274,83 +333,192 @@ function buildManifest(family, spec, a, packed) {
   return {
     family,
     version: config.version,
-    description: spec.description ?? '',
+    description: spec.description ?? "",
     individual,
     targets: targetsOf(spec),
     sourceSize: spec.sourceSize ?? null,
     atlas: packed.atlas
-      ? { image: packed.atlas.image, data: packed.atlas.data, size: packed.atlas.size }
+      ? {
+          image: packed.atlas.image,
+          data: packed.atlas.data,
+          size: packed.atlas.size,
+        }
       : null,
     pieces,
     missing: a.missing.map((id) => `${family}:${id}`),
   };
 }
 
-const safe = (s) => s.replace(/[^a-zA-Z0-9_]/g, '_');
+const safe = (s) => s.replace(/[^a-zA-Z0-9_]/g, "_");
 
-function generateRegistry(manifests) {
+/**
+ * One module per family, each importing only its own artwork.
+ *
+ * This split is what makes the package tree-shakeable. A single module that
+ * imports every family cannot be shaken — the bundler sees one object literal
+ * referencing all of them and must keep the lot, so a Pixi go visualizer ends
+ * up carrying the 54-card deck. Per-family modules let a consumer import
+ * `@kaggle-environments/design-system-assets/go` and pay for go alone.
+ */
+function generateFamilyModule(m) {
+  const f = safe(m.family);
   const imports = [];
-  const entries = [];
-  const fams = [];
+  const pieces = [];
 
-  for (const m of manifests) {
-    const f = safe(m.family);
-    if (m.atlas) {
-      imports.push(`import ${f}AtlasUrl from '../../packed/${m.family}/${m.atlas.image}';`);
-      imports.push(`import ${f}AtlasData from '../../packed/${m.family}/${m.atlas.data}';`);
+  if (m.atlas) {
+    imports.push(
+      `import ${f}AtlasUrl from '../../packed/${m.family}/${m.atlas.image}';`,
+    );
+    imports.push(
+      `import ${f}AtlasData from '../../packed/${m.family}/${m.atlas.data}';`,
+    );
+  }
+
+  for (const [pid, p] of Object.entries(m.pieces)) {
+    const short = pid.slice(pid.indexOf(":") + 1);
+    let url = "null";
+    if (p.file) {
+      const v = `${f}_${safe(short)}`;
+      imports.push(`import ${v} from '../../packed/${m.family}/${p.file}';`);
+      url = v;
     }
-    for (const [pid, p] of Object.entries(m.pieces)) {
-      const short = pid.slice(pid.indexOf(':') + 1);
-      let url = 'null';
-      if (p.file) {
-        const v = `${f}_${safe(short)}`;
-        imports.push(`import ${v} from '../../packed/${m.family}/${p.file}';`);
-        url = v;
-      }
-      entries.push(
-        `  '${pid}': { id: '${pid}', family: '${m.family}', url: ${url}, ` +
-          `atlasUrl: ${m.atlas ? `${f}AtlasUrl` : 'null'}, ` +
-          `atlasSize: ${m.atlas?.size ? JSON.stringify(m.atlas.size) : 'null'}, ` +
-          `frame: ${p.frame ? JSON.stringify(p.frame) : 'null'}, ` +
-          `sourceSize: ${p.sourceSize ? JSON.stringify(p.sourceSize) : 'null'}, ` +
-          `label: ${JSON.stringify(p.label)}, decorative: ${p.decorative}, tintable: ${p.tintable} },`
-      );
-    }
-    fams.push(
-      `  '${m.family}': { atlasUrl: ${m.atlas ? `${f}AtlasUrl` : 'null'}, ` +
-        `atlasData: ${m.atlas ? `${f}AtlasData` : 'null'}, ` +
-        `atlasSize: ${m.atlas?.size ? JSON.stringify(m.atlas.size) : 'null'}, ` +
-        `individual: ${m.individual}, targets: ${JSON.stringify(m.targets)}, ` +
-        `missing: ${JSON.stringify(m.missing)} },`
+    pieces.push(
+      `  '${pid}': { id: '${pid}', family: '${m.family}', url: ${url}, ` +
+        `atlasUrl: ${m.atlas ? `${f}AtlasUrl` : "null"}, ` +
+        `atlasSize: ${m.atlas?.size ? JSON.stringify(m.atlas.size) : "null"}, ` +
+        `frame: ${p.frame ? JSON.stringify(p.frame) : "null"}, ` +
+        `sourceSize: ${p.sourceSize ? JSON.stringify(p.sourceSize) : "null"}, ` +
+        `label: ${JSON.stringify(p.label)}, decorative: ${p.decorative}, tintable: ${p.tintable} },`,
     );
   }
 
   return [
-    '// GENERATED by scripts/build-assets.mjs — do not edit.',
-    "// Literal imports so each consumer's bundler fingerprints and copies the assets.",
-    '',
-    "import type { PieceAsset } from '../types';",
-    '',
+    "// GENERATED by scripts/build-assets.mjs — do not edit.",
+    `// The '${m.family}' family. Import this module directly to bundle only this`,
+    "// family's artwork; the barrel in ./registry pulls in every family at once.",
+    "",
+    "import type { FamilyInfo, PieceAsset } from '../types';",
+    "",
     ...imports,
-    '',
-    'export const REGISTRY: Record<string, PieceAsset> = {',
-    ...entries,
-    '};',
-    '',
-    'export interface FamilyRecord {',
-    '  atlasUrl: string | null;',
-    '  atlasData: unknown | null;',
-    '  atlasSize: { w: number; h: number } | null;',
-    '  individual: boolean;',
+    "",
+    "export const pieces: Record<string, PieceAsset> = {",
+    ...pieces,
+    "};",
+    "",
+    "const family: FamilyInfo = {",
+    `  family: '${m.family}',`,
+    `  targets: ${JSON.stringify(m.targets)},`,
+    `  atlasUrl: ${m.atlas ? `${f}AtlasUrl` : "null"},`,
+    `  atlasData: ${m.atlas ? `${f}AtlasData` : "null"},`,
+    `  atlasSize: ${m.atlas?.size ? JSON.stringify(m.atlas.size) : "null"},`,
+    `  individual: ${m.individual},`,
+    "  pieces: Object.values(pieces),",
+    `  missing: ${JSON.stringify(m.missing)},`,
+    "};",
+    "",
+    "export default family;",
+    "",
+  ].join("\n");
+}
+
+/**
+ * The barrel: every family at once, for consumers that genuinely need the whole
+ * library — the DOM `<Piece>` component resolves arbitrary ids, and the
+ * Storybook gallery enumerates across families. Pixi games should NOT import
+ * this; they import the per-family modules above.
+ */
+function generateBarrel(manifests) {
+  const names = manifests.map((m) => ({ family: m.family, v: safe(m.family) }));
+
+  return [
+    "// GENERATED by scripts/build-assets.mjs — do not edit.",
+    "// Whole-library barrel. Importing this bundles EVERY family — that is the",
+    "// point for DOM consumers, and the wrong choice for a single game's Pixi",
+    "// renderer. See ./<family> for the per-family modules.",
+    "",
+    "import type { FamilyInfo, PieceAsset } from '../types';",
+    "",
+    ...names.map(({ family, v }) => `import ${v} from './${family}';`),
+    "",
+    "export interface FamilyRecord {",
+    "  atlasUrl: string | null;",
+    "  atlasData: unknown | null;",
+    "  atlasSize: { w: number; h: number } | null;",
+    "  individual: boolean;",
     "  targets: ('pixi' | 'dom')[];",
-    '  missing: string[];',
-    '}',
-    '',
-    'export const FAMILIES: Record<string, FamilyRecord> = {',
-    ...fams,
-    '};',
-    '',
-  ].join('\n');
+    "  missing: string[];",
+    "}",
+    "",
+    `const ALL: FamilyInfo[] = [${names.map((n) => n.v).join(", ")}];`,
+    "",
+    "export const REGISTRY: Record<string, PieceAsset> = Object.fromEntries(",
+    "  ALL.flatMap((f) => f.pieces.map((p) => [p.id, p]))",
+    ");",
+    "",
+    "export const FAMILIES: Record<string, FamilyRecord> = Object.fromEntries(",
+    "  ALL.map((f) => [",
+    "    f.family,",
+    "    {",
+    "      atlasUrl: f.atlasUrl,",
+    "      atlasData: f.atlasData,",
+    "      atlasSize: f.atlasSize,",
+    "      individual: f.individual,",
+    "      targets: f.targets,",
+    "      missing: f.missing,",
+    "    },",
+    "  ])",
+    ");",
+    "",
+  ].join("\n");
+}
+
+/**
+ * Keep package.json's `typesVersions` in step with the family roster.
+ *
+ * `exports` already maps `<pkg>/<family>` for bundlers, but this repo compiles
+ * with moduleResolution:"Node", which predates `exports` and ignores it.
+ * `typesVersions` is the shim TypeScript honours there. It has to list families
+ * explicitly — a catch-all `"*"` pattern also captures the bare root import and
+ * sends it to a file that doesn't exist, which breaks every consumer.
+ */
+function syncTypesVersions(manifests) {
+  const pkgPath = join(PKG, "package.json");
+  const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
+  const want = Object.fromEntries(
+    manifests.map((m) => [m.family, [`./dist/generated/${m.family}.d.ts`]]),
+  );
+  const have = pkg.typesVersions?.["*"] ?? {};
+  if (JSON.stringify(have) === JSON.stringify(want)) return;
+
+  pkg.typesVersions = { "*": want };
+  writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
+  console.log(
+    `  updated package.json typesVersions (${manifests.length} families)`,
+  );
+}
+
+/**
+ * Drop generated modules for families that no longer exist. Best-effort: some
+ * sandboxes mount the tree without unlink permission, and a stale module is a
+ * warning-level problem, not a reason to fail the build.
+ */
+function pruneGenerated(manifests) {
+  const keep = new Set([
+    ...manifests.map((m) => `${m.family}.ts`),
+    "registry.ts",
+  ]);
+  if (!existsSync(GENERATED)) return;
+  for (const f of readdirSync(GENERATED)) {
+    if (!f.endsWith(".ts") || keep.has(f)) continue;
+    try {
+      rmSync(join(GENERATED, f));
+      console.log(`  pruned stale src/generated/${f}`);
+    } catch {
+      console.warn(
+        `  WARNING: could not remove stale src/generated/${f} — delete it by hand.`,
+      );
+    }
+  }
 }
 
 /** Every path the generated registry imports must exist on disk. */
@@ -360,22 +528,35 @@ function verifyOutputs(manifests) {
     const dir = join(PACKED, m.family);
     const spec = config.families[m.family];
     if (wantsAtlas(spec)) {
-      if (!m.atlas) { problems.push(`${m.family}: atlas expected but none produced`); continue; }
-      for (const f of [m.atlas.image, m.atlas.data]) {
-        if (!existsSync(join(dir, f))) problems.push(`${m.family}: missing packed/${m.family}/${f}`);
+      if (!m.atlas) {
+        problems.push(`${m.family}: atlas expected but none produced`);
+        continue;
       }
-      if (!m.atlas.size) problems.push(`${m.family}: atlas has no size in meta — DOM can't compute background-size`);
+      for (const f of [m.atlas.image, m.atlas.data]) {
+        if (!existsSync(join(dir, f)))
+          problems.push(`${m.family}: missing packed/${m.family}/${f}`);
+      }
+      if (!m.atlas.size)
+        problems.push(
+          `${m.family}: atlas has no size in meta — DOM can't compute background-size`,
+        );
       for (const p of Object.values(m.pieces)) {
         if (!p.frame) problems.push(`${p.id}: no atlas frame`);
       }
     }
     for (const p of Object.values(m.pieces)) {
-      if (p.file && !existsSync(join(dir, p.file))) problems.push(`${p.id}: missing packed/${m.family}/${p.file}`);
-      if (!p.file && !wantsAtlas(spec)) problems.push(`${p.id}: family is atlas-less but emits no individual file`);
+      if (p.file && !existsSync(join(dir, p.file)))
+        problems.push(`${p.id}: missing packed/${m.family}/${p.file}`);
+      if (!p.file && !wantsAtlas(spec))
+        problems.push(
+          `${p.id}: family is atlas-less but emits no individual file`,
+        );
     }
   }
   if (problems.length) {
-    console.error(`\nERROR: build produced ${problems.length} dangling reference(s):`);
+    console.error(
+      `\nERROR: build produced ${problems.length} dangling reference(s):`,
+    );
     for (const p of problems.slice(0, 20)) console.error(`  - ${p}`);
     process.exit(1);
   }
@@ -385,13 +566,21 @@ function verifyOutputs(manifests) {
 
 console.log(`\nAuditing roster (families.json v${config.version}):`);
 const auditResults = audit();
-if (checkOnly) { console.log('\n--check: roster OK, skipping packing.\n'); process.exit(0); }
+if (checkOnly) {
+  console.log("\n--check: roster OK, skipping packing.\n");
+  process.exit(0);
+}
 
 if (noPack) {
-  if (!existsSync(RAW)) { console.error('ERROR: --no-pack but .packer-work/out is absent. Run a full build first.'); process.exit(1); }
-  console.log('\n--no-pack: reusing existing packer output.');
+  if (!existsSync(RAW)) {
+    console.error(
+      "ERROR: --no-pack but .packer-work/out is absent. Run a full build first.",
+    );
+    process.exit(1);
+  }
+  console.log("\n--no-pack: reusing existing packer output.");
 } else {
-  console.log('\nPacking…');
+  console.log("\nPacking…");
   runPacker();
 }
 
@@ -408,23 +597,42 @@ for (const [family, spec] of Object.entries(config.families)) {
   // independent outputs: an atlas-less family (cards) still emits singles, so
   // these must not be nested under one guard.
   if (packed.atlas) {
-    copyFileSync(join(packed.atlas.dir, packed.atlas.image), join(outDir, packed.atlas.image));
+    copyFileSync(
+      join(packed.atlas.dir, packed.atlas.image),
+      join(outDir, packed.atlas.image),
+    );
     copyFileSync(packed.atlas.path, join(outDir, packed.atlas.data));
   }
   for (const s of packed.singles) {
     const dest = join(outDir, basename(s));
-    if (!existsSync(dest) || statSync(s).mtimeMs > statSync(dest).mtimeMs) copyFileSync(s, dest);
+    if (!existsSync(dest) || statSync(s).mtimeMs > statSync(dest).mtimeMs)
+      copyFileSync(s, dest);
   }
 
   const manifest = buildManifest(family, spec, auditResults[family], packed);
-  writeFileSync(join(outDir, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
+  writeFileSync(
+    join(outDir, "manifest.json"),
+    JSON.stringify(manifest, null, 2) + "\n",
+  );
   manifests.push(manifest);
   console.log(
-    `  ${family}: ${Object.keys(manifest.pieces).length} pieces, atlas ${packed.atlas ? `${packed.atlas.size?.w}x${packed.atlas.size?.h}` : 'NO'}` +
-      `${manifest.individual ? `, ${packed.singles.length} individual` : ''} → packed/${family}/`
+    `  ${family}: ${Object.keys(manifest.pieces).length} pieces, atlas ${packed.atlas ? `${packed.atlas.size?.w}x${packed.atlas.size?.h}` : "NO"}` +
+      `${manifest.individual ? `, ${packed.singles.length} individual` : ""} → packed/${family}/`,
   );
 }
 
 verifyOutputs(manifests);
-writeFileSync(join(GENERATED, 'registry.ts'), generateRegistry(manifests));
-console.log(`\nWrote src/generated/registry.ts (${manifests.reduce((n, m) => n + Object.keys(m.pieces).length, 0)} pieces)\n`);
+
+for (const m of manifests) {
+  writeFileSync(join(GENERATED, `${m.family}.ts`), generateFamilyModule(m));
+}
+writeFileSync(join(GENERATED, "registry.ts"), generateBarrel(manifests));
+pruneGenerated(manifests);
+syncTypesVersions(manifests);
+
+const total = manifests.reduce((n, m) => n + Object.keys(m.pieces).length, 0);
+console.log(
+  `\nWrote src/generated/: ${manifests.length} family modules + registry.ts barrel (${total} pieces)\n` +
+    `  Pixi games should import '@kaggle-environments/design-system-assets/<family>',\n` +
+    `  not the package root — the root barrel bundles every family.\n`,
+);
