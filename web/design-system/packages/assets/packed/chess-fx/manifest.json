@@ -1,0 +1,209 @@
+{
+  "family": "chess-fx",
+  "version": 1,
+  "description": "Chess's own motion particles. Not reusable — several are piece silhouettes.",
+  "individual": false,
+  "targets": [
+    "pixi",
+    "dom"
+  ],
+  "sourceSize": null,
+  "atlas": {
+    "image": "chess-fx.webp",
+    "data": "chess-fx.webp.json",
+    "size": {
+      "w": 393,
+      "h": 315
+    }
+  },
+  "pieces": {
+    "chess-fx:bishop1": {
+      "id": "chess-fx:bishop1",
+      "file": null,
+      "frame": {
+        "x": 193,
+        "y": 148,
+        "w": 144,
+        "h": 144
+      },
+      "sourceSize": {
+        "w": 144,
+        "h": 144
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "chess-fx:bishop2": {
+      "id": "chess-fx:bishop2",
+      "file": null,
+      "frame": {
+        "x": 247,
+        "y": 2,
+        "w": 144,
+        "h": 144
+      },
+      "sourceSize": {
+        "w": 144,
+        "h": 144
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "chess-fx:knight-shadow": {
+      "id": "chess-fx:knight-shadow",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 185,
+        "w": 128,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "chess-fx:pawn": {
+      "id": "chess-fx:pawn",
+      "file": null,
+      "frame": {
+        "x": 173,
+        "y": 76,
+        "w": 18,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 18,
+        "h": 96
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "chess-fx:rook1": {
+      "id": "chess-fx:rook1",
+      "file": null,
+      "frame": {
+        "x": 173,
+        "y": 2,
+        "w": 72,
+        "h": 72
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 72
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "chess-fx:rook2": {
+      "id": "chess-fx:rook2",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 111,
+        "w": 72,
+        "h": 72
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 72
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "chess-fx:rook3": {
+      "id": "chess-fx:rook3",
+      "file": null,
+      "frame": {
+        "x": 99,
+        "y": 76,
+        "w": 72,
+        "h": 72
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 72
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "chess-fx:rook4": {
+      "id": "chess-fx:rook4",
+      "file": null,
+      "frame": {
+        "x": 99,
+        "y": 2,
+        "w": 72,
+        "h": 72
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 72
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "chess-fx:squiggle-1": {
+      "id": "chess-fx:squiggle-1",
+      "file": null,
+      "frame": {
+        "x": 52,
+        "y": 2,
+        "w": 45,
+        "h": 107
+      },
+      "sourceSize": {
+        "w": 45,
+        "h": 107
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "chess-fx:squiggle-2": {
+      "id": "chess-fx:squiggle-2",
+      "file": null,
+      "frame": {
+        "x": 27,
+        "y": 2,
+        "w": 23,
+        "h": 57
+      },
+      "sourceSize": {
+        "w": 23,
+        "h": 57
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "chess-fx:squiggle-3": {
+      "id": "chess-fx:squiggle-3",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 2,
+        "w": 23,
+        "h": 57
+      },
+      "sourceSize": {
+        "w": 23,
+        "h": 57
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    }
+  },
+  "missing": []
+}

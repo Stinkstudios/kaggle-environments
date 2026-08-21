@@ -14,3 +14,30 @@ export type Layer = (typeof LAYERS)[number];
 
 export type PieceType = 'p' | 'n' | 'b' | 'r' | 'q' | 'k';
 export type PieceColor = 'w' | 'b';
+
+/** chess.js piece letters -> the names used in the shared asset id vocabulary. */
+export const PIECE_NAME: Record<PieceType, string> = {
+  p: 'pawn',
+  n: 'knight',
+  b: 'bishop',
+  r: 'rook',
+  q: 'queen',
+  k: 'king',
+};
+
+/**
+ * Stable asset id for a piece, e.g. pieceId('w', 'k') -> 'chess:w-king'.
+ * Renderers address artwork by id; filenames never appear in game code.
+ */
+export function pieceId(color: PieceColor, type: PieceType): string {
+  return `chess:${color}-${PIECE_NAME[type]}`;
+}
+
+/**
+ * Asset families this visualizer loads at start-up.
+ *
+ * `fx` is the shared particle family (puffs, used by go too); `chess-fx` is
+ * this game's own — several of those particles are chess piece silhouettes and
+ * are deliberately not offered as generic decoration.
+ */
+export const ASSET_FAMILIES = ['chess', 'board', 'fx', 'chess-fx'] as const;

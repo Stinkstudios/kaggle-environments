@@ -3,7 +3,7 @@ import { drawBoard } from './board';
 import { engine, initialiseEngine, type Engine } from './engine';
 import { syncCapture } from './capture';
 import { syncHighlights } from './highlights';
-import { loadPieceTextureAtlas, syncPieces } from './pieces';
+import { loadGameTextures, syncPieces } from './pieces';
 import { createTrails } from './trails';
 import { SCRUB_THRESHOLD_MS } from '../constants';
 import type { PreferencesState } from '../stores/usePreferences';
@@ -30,10 +30,10 @@ export async function createGame(canvas: HTMLCanvasElement): Promise<Game> {
   const eng = engine();
   await initialiseEngine(eng, canvas);
 
-  eng.textures = await loadPieceTextureAtlas();
+  eng.textures = await loadGameTextures();
 
   // Draw board, and cache so we only draw it once.
-  const board = drawBoard(eng.squareSize, eng.boardOffset, eng.textures['dark-tile.png']);
+  const board = drawBoard(eng.squareSize, eng.boardOffset, eng.textures['board:dark-tile']);
   board.cacheAsTexture(true);
   eng.resources.background.addChild(board);
 

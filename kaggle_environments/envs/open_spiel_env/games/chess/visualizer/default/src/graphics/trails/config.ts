@@ -20,7 +20,7 @@ export interface TrailConfig {
 export const TRAIL_CONFIGS: Record<PieceType, TrailConfig> = {
   // King: anxious, trembling squiggles
   k: {
-    textures: ['particles/squiggle-1.png', 'particles/squiggle-2.png', 'particles/squiggle-3.png'],
+    textures: ['chess-fx:squiggle-1', 'chess-fx:squiggle-2', 'chess-fx:squiggle-3'],
     size: [0.06, 0.12],
     rate: 0.03,
     count: 1,
@@ -32,7 +32,7 @@ export const TRAIL_CONFIGS: Record<PieceType, TrailConfig> = {
 
   // Queen: heavy, confident puffs
   q: {
-    textures: ['particles/puff1.png', 'particles/puff2.png', 'particles/puff3.png'],
+    textures: ['fx:puff1', 'fx:puff2', 'fx:puff3'],
     size: [0.2, 0.5],
     rate: 0.02,
     count: 1,
@@ -43,7 +43,7 @@ export const TRAIL_CONFIGS: Record<PieceType, TrailConfig> = {
 
   // Bishop: flowing, graceful drift
   b: {
-    textures: ['particles/bishop1.png', 'particles/bishop2.png'],
+    textures: ['chess-fx:bishop1', 'chess-fx:bishop2'],
     size: [0.2, 0.4],
     rate: 0.015,
     count: 1,
@@ -55,7 +55,7 @@ export const TRAIL_CONFIGS: Record<PieceType, TrailConfig> = {
 
   // Knight: shadow afterimage
   n: {
-    textures: ['particles/knight-shadow.png'],
+    textures: ['chess-fx:knight-shadow'],
     size: [1, 1],
     rate: 0,
     count: 1,
@@ -67,7 +67,7 @@ export const TRAIL_CONFIGS: Record<PieceType, TrailConfig> = {
 
   // Rook: heavy burst of debris scattered around start position
   r: {
-    textures: ['particles/rook1.png', 'particles/rook2.png', 'particles/rook3.png', 'particles/rook4.png'],
+    textures: ['chess-fx:rook1', 'chess-fx:rook2', 'chess-fx:rook3', 'chess-fx:rook4'],
     size: [0.1, 0.35],
     rate: 0.03,
     count: 2,
@@ -79,7 +79,7 @@ export const TRAIL_CONFIGS: Record<PieceType, TrailConfig> = {
 
   // Pawn: zippy directional marks
   p: {
-    textures: ['particles/pawn.png'],
+    textures: ['chess-fx:pawn'],
     size: [0.02, 0.05],
     rate: 0.01,
     count: 1,

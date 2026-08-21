@@ -1,0 +1,229 @@
+{
+  "family": "chess",
+  "version": 1,
+  "description": "Figurative chess pieces",
+  "individual": false,
+  "targets": [
+    "pixi",
+    "dom"
+  ],
+  "sourceSize": {
+    "w": 256,
+    "h": 256
+  },
+  "atlas": {
+    "image": "chess.webp",
+    "data": "chess.webp.json",
+    "size": {
+      "w": 1034,
+      "h": 776
+    }
+  },
+  "pieces": {
+    "chess:b-bishop": {
+      "id": "chess:b-bishop",
+      "file": null,
+      "frame": {
+        "x": 776,
+        "y": 518,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "label": "black bishop",
+      "decorative": false,
+      "tintable": false
+    },
+    "chess:b-king": {
+      "id": "chess:b-king",
+      "file": null,
+      "frame": {
+        "x": 776,
+        "y": 260,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "label": "black king",
+      "decorative": false,
+      "tintable": false
+    },
+    "chess:b-knight": {
+      "id": "chess:b-knight",
+      "file": null,
+      "frame": {
+        "x": 776,
+        "y": 2,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "label": "black knight",
+      "decorative": false,
+      "tintable": false
+    },
+    "chess:b-pawn": {
+      "id": "chess:b-pawn",
+      "file": null,
+      "frame": {
+        "x": 518,
+        "y": 518,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "label": "black pawn",
+      "decorative": false,
+      "tintable": false
+    },
+    "chess:b-queen": {
+      "id": "chess:b-queen",
+      "file": null,
+      "frame": {
+        "x": 260,
+        "y": 518,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "label": "black queen",
+      "decorative": false,
+      "tintable": false
+    },
+    "chess:b-rook": {
+      "id": "chess:b-rook",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 518,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "label": "black rook",
+      "decorative": false,
+      "tintable": false
+    },
+    "chess:w-bishop": {
+      "id": "chess:w-bishop",
+      "file": null,
+      "frame": {
+        "x": 518,
+        "y": 260,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "label": "white bishop",
+      "decorative": false,
+      "tintable": false
+    },
+    "chess:w-king": {
+      "id": "chess:w-king",
+      "file": null,
+      "frame": {
+        "x": 518,
+        "y": 2,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "label": "white king",
+      "decorative": false,
+      "tintable": false
+    },
+    "chess:w-knight": {
+      "id": "chess:w-knight",
+      "file": null,
+      "frame": {
+        "x": 260,
+        "y": 260,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "label": "white knight",
+      "decorative": false,
+      "tintable": false
+    },
+    "chess:w-pawn": {
+      "id": "chess:w-pawn",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 260,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "label": "white pawn",
+      "decorative": false,
+      "tintable": false
+    },
+    "chess:w-queen": {
+      "id": "chess:w-queen",
+      "file": null,
+      "frame": {
+        "x": 260,
+        "y": 2,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "label": "white queen",
+      "decorative": false,
+      "tintable": false
+    },
+    "chess:w-rook": {
+      "id": "chess:w-rook",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 2,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "label": "white rook",
+      "decorative": false,
+      "tintable": false
+    }
+  },
+  "missing": []
+}
