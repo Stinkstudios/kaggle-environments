@@ -1,8 +1,9 @@
 # `@kaggle-environments/board`
 
 Board geometry for game visualizers: coords ⇄ pixels, fitting, adjacency,
-and state diffing. **No runtime dependencies** — not React, not Pixi, not the DOM — so
-the PixiJS visualizers (`chess`, `go`) and the Canvas2D ones consume the identical
+and state diffing, plus the two renderer-agnostic derivations every board draws
+from. **No runtime dependencies** — not React, not Pixi, not the DOM — so the
+PixiJS visualizers (`chess`, `go`) and the Canvas2D ones consume the identical
 `Board` object.
 
 It has no opinion about what a piece looks like. That stays per-game, permanently.
@@ -95,6 +96,32 @@ sides points the same way. Boards whose primary element is a point (Go, an
 irregular graph) get `elements` but no `segments` — there are no polygons to
 take a facet from.
 
+## Drawing derivations
+
+Two things every renderer needs, derived from the geometry and handed back as
+plain data. They live here, not in the PixiJS package, because a Canvas2D
+renderer cannot import from behind a `pixi.js` dependency — and Canvas2D is most
+of them.
+
+```ts
+latticeStrokes(board);   // edges merged into maximal straight runs
+labelPlacements(board, { offset, text: (element, side) => … });
+```
+
+`latticeStrokes` turns a 19x19 Go board's 684 unit edges into the 38 lines a
+player sees. A flat stroke looks the same either way, so this only earns its
+place because textured lines exist: `go` draws each one as a `TilingSprite` of a
+brush texture, and 684 sprites would restart the brush at every intersection.
+`nine_mens_morris` hand-rolls the same merge as its own `deriveLines`.
+
+`labelPlacements` anchors to the **board's extent**, not to the outermost
+element — so a face board's labels sit outside the squares rather than half a
+cell inside them. It returns `{ text, x, y, side, element }`; what draws them is
+the caller's business. Read the element's `coord` to decide the text: `board.sides`
+runs clockwise, so `'e'` and `'w'` traverse rows in opposite directions and the
+side id alone can't tell you which row you are on. `GO_COLUMN_LETTERS` omits `I`;
+`COLUMN_LETTERS` does not.
+
 ## Diffing
 
 ```ts
@@ -127,7 +154,11 @@ If a test ever needs jsdom, something has leaked into the wrong entry point.
 
 ## Not here yet
 
-The canvas host — creation scoped to a parent, `devicePixelRatio` scaling,
-`ResizeObserver` — lands as a separate `./canvas` entry point in the next phase, so this
-one stays usable from PixiJS. Non-uniform pitch (`quoridor`'s wall gaps) and banded
-layouts (`backgammon`) are not modelled; those stay bespoke.
+Drawing lives in `@kaggle-environments/design-system-board-renderer`, which wraps
+the derivations above for PixiJS and adds the app, named layers, texture loading
+and sprite reconciliation. This package stays renderer-agnostic and
+dependency-free, which is what lets the Canvas2D renderers consume the identical
+`Board`.
+
+Non-uniform pitch (`quoridor`'s wall gaps) and banded layouts (`backgammon`) are
+not modelled; those stay bespoke.
