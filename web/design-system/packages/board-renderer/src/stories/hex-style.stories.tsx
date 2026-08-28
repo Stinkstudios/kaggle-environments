@@ -117,6 +117,48 @@ export const CellStyles: StoryObj = {
   },
 };
 
+/**
+ * Solid and dashed, both as halves.
+ *
+ * The dashed master is where doubling hurts most. Two doubled solid strokes
+ * merge into one slightly heavier line; two doubled dashed strokes arrive at
+ * different phases and interleave, because the two cells present opposite edges
+ * of the artwork to the same lattice edge and traverse them in opposite
+ * directions.
+ *
+ * Note the dash pattern is phase-aligned to the vertices — each edge begins and
+ * ends with a half-length dash, so two edges meeting at a vertex read as one
+ * dash across it. That is also why the halves can be cut at a vertex without
+ * disturbing the rhythm.
+ */
+export const SolidAndDashed: StoryObj = {
+  render: function Render() {
+    const board = useHexBoard('hexagon', 'pointy');
+    return (
+      <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
+        <HexBoard
+          board={board}
+          draw={(renderer, b) =>
+            renderer.layers.board.addChild(
+              drawFaceSprites(b, { style: 'hex-half-solid', textures: renderer.textures })
+            )
+          }
+          caption="hex-half-solid"
+        />
+        <HexBoard
+          board={board}
+          draw={(renderer, b) =>
+            renderer.layers.board.addChild(
+              drawFaceSprites(b, { style: 'hex-half-dash', textures: renderer.textures })
+            )
+          }
+          caption="hex-half-dash"
+        />
+      </div>
+    );
+  },
+};
+
 /** With and without the boundary closed, which is the `closeBoundary` call. */
 export const Boundary: StoryObj = {
   render: function Render() {

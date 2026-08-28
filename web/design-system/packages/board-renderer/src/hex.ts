@@ -14,25 +14,36 @@ import type { Board, Face } from '@kaggle-environments/board';
 export const HEX_ASSET_VERTEX_ANGLE = -Math.PI / 2;
 
 /**
- * Where the master's stroke *centreline* sits, as a fraction of the canvas's
- * half-height.
+ * Where each master's stroke *centreline* sits, as a fraction of that master's
+ * canvas half-height.
  *
- * The artwork is cropped to the outside of a stroke with real width, so fitting
- * the canvas to the cell seats the drawn line inside it and neighbouring
- * outlines never touch. Measured off `hex-solid.png` by taking the
- * alpha-weighted mean projection onto each of the six edge normals, sampling
- * only the flat middle of each edge so the vertices don't skew it: the six agree
- * to within 0.24%, giving a centreline circumradius of 169.72 against a canvas
- * half-height of 174.
+ * The artwork is cropped close to the outside of a stroke with real width, so
+ * fitting the canvas to the cell seats the drawn line inside it and neighbouring
+ * outlines never touch. Measured by taking the alpha-weighted mean projection
+ * onto each of the six edge normals, sampling only the flat middle of each edge
+ * so the vertices don't skew it -- and, for the dashed master, so the gaps drop
+ * samples without biasing the perpendicular mean.
  *
- * Fitting the canvas would therefore draw the hexagon at 97.5% of the cell and
- * leave a 2.5% gap at every shared edge. {@link HEX_ART_FIT} is the reciprocal
- * that cancels it, and is the default `scale` the style ships with.
+ * **One value per master, not one shared constant.** The two exports do not
+ * share a canvas: `hex-solid` is 302x348 with the ink flush to the edges,
+ * `hex-dash` is 304x353 with a little padding. Using the solid's number for the
+ * dashed board would draw it 1.2% small and open a gap at every shared edge --
+ * exactly the defect this constant exists to prevent. A `-half-` variant is cut
+ * from its whole counterpart and so inherits that counterpart's canvas and
+ * number.
  */
-export const HEX_ART_CENTRELINE_RATIO = 169.72 / 174;
+export const HEX_ART_CENTRELINE_RATIO = {
+  solid: 169.72 / 174,
+  dash: 170.16 / 176.5,
+} as const;
 
-/** Scale that seats the drawn centreline on the cell boundary. */
-export const HEX_ART_FIT = 1 / HEX_ART_CENTRELINE_RATIO;
+/** Which master a cell style's artwork was drawn on. */
+export type HexArtMaster = keyof typeof HEX_ART_CENTRELINE_RATIO;
+
+/** Scale that seats a master's drawn centreline on the cell boundary. */
+export function hexArtFit(master: HexArtMaster): number {
+  return 1 / HEX_ART_CENTRELINE_RATIO[master];
+}
 
 /** A hexagon maps onto itself every 60 degrees. */
 export const HEX_SYMMETRY = Math.PI / 3;

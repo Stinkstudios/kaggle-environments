@@ -151,9 +151,15 @@ Where the lines *are* the cell, the artwork is too. `drawFaceSprites` places one
 sprite per face:
 
 ```ts
-drawFaceSprites(board, { style: 'hex-half-solid', textures });   // what a board wants
-drawFaceSprites(board, { style: 'hex-solid', textures });        // one cell, drawn whole
+drawFaceSprites(board, { textures });                          // hex-half-solid, the default
+drawFaceSprites(board, { style: 'hex-half-dash', textures });  // the dashed set
+drawFaceSprites(board, { style: 'hex-solid', textures });      // one cell, drawn whole
 ```
+
+Four styles: `hex-solid` / `hex-dash` draw the whole outline, `hex-half-solid` /
+`hex-half-dash` draw three contiguous edges. **The default is `hex-half-solid`**
+— a board almost always wants a half, and the whole outline is really only right
+for a cell shown on its own.
 
 This is a separate function from `drawGrid` rather than another `GridStyleName`,
 because the two consume different geometry. `drawGrid` tiles a strip along the
@@ -169,8 +175,12 @@ run instead of shipping a vertical copy.
 
 ### Halves, and why they are the default for a board
 
-`hex-solid` draws a closed outline per cell. Every interior edge belongs to two
-cells, so it gets drawn twice — 462 of 552 edges on a size-8 Havannah board.
+A whole outline per cell draws every interior edge twice — 462 of 552 edges on a
+size-8 Havannah board. That is worse for `dash` than for `solid`: two doubled
+solid strokes merge into one slightly heavier line, but two doubled dashed
+strokes arrive at different phases and interleave, because the two cells present
+opposite edges of the artwork to the same lattice edge and traverse them in
+opposite directions.
 `hex-half-solid` carries three contiguous edges instead, and the three
 neighbours draw the rest: each shared edge lands exactly once, for half the
 sprites. Verified across every extent, both orientations and a flipped board.
@@ -186,6 +196,13 @@ the game draws its own border off `board.sides`, which every hex game here does.
 
 Two implementation notes, both load-bearing:
 
+- **The fit constant is per master, not global.** `hex-solid` is 302×348 with
+  the ink flush to the edges; `hex-dash` is 304×353 with a little padding, and
+  its stroke centreline sits at a different fraction of the canvas (0.9641 vs
+  0.9754). Using one number for both would draw the dashed board 1.2% small and
+  reopen the gap at every shared edge. A `-half-` variant is cut from its whole
+  counterpart, so it inherits that canvas and that number. If future variants are
+  exported from a shared artboard this collapses back to one constant.
 - **The atlas must stay untrimmed.** The fit maps the master's *canvas* to the
   cell, so a trimmed frame would scale and seat the art wrongly — and the half
   is mostly empty canvas, so it is the first thing to break. `allowTrim: false`

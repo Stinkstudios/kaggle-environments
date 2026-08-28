@@ -1,6 +1,6 @@
 import { latticeStrokes, type Board, type Face, type Vec2 } from '@kaggle-environments/board';
 import { Container, Graphics, Sprite, TilingSprite, type Texture } from 'pixi.js';
-import { complementFaces, faceRadius, HEX_ART_FIT, hexRotation } from './hex';
+import { complementFaces, faceRadius, hexArtFit, hexRotation, type HexArtMaster } from './hex';
 import { requireTexture, type TextureMap } from './textures';
 
 /**
@@ -179,17 +179,19 @@ export function drawFaces(board: Board, options: FacesOptions = {}): Graphics {
  * restyling every hex board in the repo should be a change here, not a change
  * in N renderers.
  *
- * - `hex-solid`      -- a hand-drawn hexagon outline, one per cell.
- * - `hex-half-solid` -- three contiguous edges of it, so a tiling draws each
- *   shared edge once rather than twice. Half the sprites, and interior lines
- *   stop carrying more weight than the boundary. Prefer this for a board;
- *   `hex-solid` remains right for a cell shown on its own.
+ * - `hex-solid` / `hex-dash` -- a hand-drawn hexagon outline, one per cell.
+ * - `hex-half-solid` / `hex-half-dash` -- three contiguous edges of it, so a
+ *   tiling draws each shared edge once rather than twice. Half the sprites, and
+ *   interior lines stop carrying more weight than the boundary.
  *
- * The `-solid` suffix mirrors `squiggle-dash`: the same hand-drawn set has
- * dashed variants coming, and a bare `hex` would need renaming across every
- * board the day they land.
+ * **Boards want a `-half-` style.** The whole outline is right for a cell shown
+ * on its own, and that is about all. The case is stronger for `dash` than for
+ * `solid`: two doubled solid strokes merge into one slightly heavier line, but
+ * two doubled *dashed* strokes arrive at different phases -- the two cells
+ * present opposite edges of the artwork to the same lattice edge, traversed in
+ * opposite directions -- so the dashes interleave rather than coincide.
  */
-export type FaceStyleName = 'hex-solid' | 'hex-half-solid';
+export type FaceStyleName = 'hex-solid' | 'hex-half-solid' | 'hex-dash' | 'hex-half-dash';
 
 export interface FaceSpritesOptions {
   /** Defaults to `hex-solid`, the only cell style drawn so far. */
@@ -232,14 +234,22 @@ export interface FaceSpritesOptions {
   closeBoundary?: boolean;
 }
 
-const FACE_STYLE_ASSETS: Record<FaceStyleName, string> = {
-  'hex-solid': 'board:hex-solid',
-  'hex-half-solid': 'board:hex-half-solid',
-};
+interface FaceStyle {
+  /** Asset id in the shared `board` family. */
+  asset: string;
+  /** Which master it was drawn on -- decides the fit, which is per-master. */
+  master: HexArtMaster;
+  /** Draws a partial outline, so the board's boundary needs closing. */
+  half: boolean;
+}
 
-/** Styles that draw a partial outline and so need the boundary closing. */
-const HALF_STYLES: ReadonlySet<FaceStyleName> = new Set<FaceStyleName>(['hex-half-solid']);
-const FACE_SPRITE_DEFAULTS = { color: 0xffffff, alpha: 1, scale: HEX_ART_FIT, closeBoundary: true };
+const FACE_STYLES: Record<FaceStyleName, FaceStyle> = {
+  'hex-solid': { asset: 'board:hex-solid', master: 'solid', half: false },
+  'hex-half-solid': { asset: 'board:hex-half-solid', master: 'solid', half: true },
+  'hex-dash': { asset: 'board:hex-dash', master: 'dash', half: false },
+  'hex-half-dash': { asset: 'board:hex-half-dash', master: 'dash', half: true },
+};
+const FACE_SPRITE_DEFAULTS = { color: 0xffffff, alpha: 1, closeBoundary: true };
 
 /**
  * Draw the design system's hand-drawn cell artwork, one sprite per face.
@@ -258,21 +268,23 @@ const FACE_SPRITE_DEFAULTS = { color: 0xffffff, alpha: 1, scale: HEX_ART_FIT, cl
  * can be made by looking.
  */
 export function drawFaceSprites(board: Board, options: FaceSpritesOptions = {}): Container {
-  const { textures, color, alpha, scale, closeBoundary } = { ...FACE_SPRITE_DEFAULTS, ...options };
-  const style = options.style ?? 'hex-solid';
-  const assetId = FACE_STYLE_ASSETS[style];
+  const { textures, color, alpha, closeBoundary } = { ...FACE_SPRITE_DEFAULTS, ...options };
+  const style = options.style ?? 'hex-half-solid';
+  const { asset, master, half } = FACE_STYLES[style];
+  // The fit is per-master, so it cannot live in the defaults object.
+  const scale = options.scale ?? hexArtFit(master);
 
-  const texture = options.texture ?? (textures ? requireTexture(textures, assetId) : undefined);
+  const texture = options.texture ?? (textures ? requireTexture(textures, asset) : undefined);
   if (!texture) {
     throw new Error(
       `[board-renderer] the '${style}' cell style needs artwork. Pass \`textures\` ` +
-        `(having loaded the shared 'board' asset family, which carries ${assetId}), ` +
+        `(having loaded the shared 'board' asset family, which carries ${asset}), ` +
         `or pass \`texture\` to override the style's own.`
     );
   }
 
   const container = new Container();
-  const complement = HALF_STYLES.has(style) && closeBoundary ? complementFaces(board) : null;
+  const complement = half && closeBoundary ? complementFaces(board) : null;
 
   board.faces.forEach((face, index) => {
     // Pointing hex artwork at a square lattice silently draws hexagons over the

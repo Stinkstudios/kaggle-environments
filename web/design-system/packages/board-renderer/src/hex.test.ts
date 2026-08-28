@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { hexLattice } from '@kaggle-environments/board';
-import { complementFaces, faceRadius, HEX_ART_CENTRELINE_RATIO, HEX_ART_FIT, hexRotation, keptEdges } from './hex';
+import {
+  complementFaces,
+  faceRadius,
+  HEX_ART_CENTRELINE_RATIO,
+  hexArtFit,
+  hexRotation,
+  keptEdges,
+  type HexArtMaster,
+} from './hex';
 
 const DEGREES = 180 / Math.PI;
 
@@ -60,21 +68,35 @@ describe('faceRadius', () => {
   });
 });
 
-describe('HEX_ART_FIT', () => {
-  it('lands the drawn centreline exactly on the cell boundary', () => {
+describe('the per-master fit', () => {
+  const MASTERS: HexArtMaster[] = ['solid', 'dash'];
+
+  it('lands each master\'s drawn centreline exactly on the cell boundary', () => {
     const board = hexLattice({ extent: 'hexagon', size: 3, fit: { width: 400, height: 400 } });
-    for (const face of board.faces) {
-      const cell = faceRadius(face);
-      // What the sprite actually draws: the canvas is fitted to the cell, then
-      // the ink sits at CENTRELINE_RATIO of that, then `scale` corrects it.
-      const drawn = cell * HEX_ART_CENTRELINE_RATIO * HEX_ART_FIT;
-      expect(drawn).toBeCloseTo(cell, 6);
+    for (const master of MASTERS) {
+      for (const face of board.faces) {
+        const cell = faceRadius(face);
+        // What the sprite actually draws: the canvas is fitted to the cell, the
+        // ink sits at this master's ratio of that, then `scale` corrects it.
+        const drawn = cell * HEX_ART_CENTRELINE_RATIO[master] * hexArtFit(master);
+        expect(drawn, master).toBeCloseTo(cell, 6);
+      }
     }
   });
 
-  it('is a correction upward — the uncorrected fit draws ~2.5% small', () => {
-    expect(HEX_ART_FIT).toBeGreaterThan(1);
-    expect(1 - HEX_ART_CENTRELINE_RATIO).toBeCloseTo(0.0246, 3);
+  it('corrects upward — every master is cropped inside its canvas', () => {
+    for (const master of MASTERS) {
+      expect(hexArtFit(master), master).toBeGreaterThan(1);
+      expect(HEX_ART_CENTRELINE_RATIO[master], master).toBeLessThan(1);
+    }
+  });
+
+  it('keeps the masters apart — they are not drawn on the same canvas', () => {
+    // hex-solid is 302x348 with the ink flush to the edges; hex-dash is 304x353
+    // with padding. Collapsing these to one constant would draw the dashed board
+    // ~1.2% small and reopen a gap at every shared edge.
+    expect(HEX_ART_CENTRELINE_RATIO.solid).not.toBeCloseTo(HEX_ART_CENTRELINE_RATIO.dash, 3);
+    expect(Math.abs(hexArtFit('dash') / hexArtFit('solid') - 1)).toBeGreaterThan(0.01);
   });
 });
 
