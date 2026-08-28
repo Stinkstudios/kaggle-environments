@@ -45,6 +45,39 @@ export const CardDeck: Story = {
 };
 
 /**
+ * The same deck under the four-colour convention poker uses to keep the suits
+ * apart: diamonds blue, clubs green, spades and hearts unchanged.
+ *
+ * Every card here is addressed by its *base* id with `prefer` set. The variant
+ * family only holds the 26 faces that differ, so the spade and heart rows —
+ * plus the back and joker — fall through to `card` rather than being duplicated
+ * on disk. Addressing `card-four-color:a-spade` directly would render nothing.
+ */
+export const FourColorDeck: Story = {
+  render: () => (
+    <div className="flex flex-col gap-2">
+      {SUITS.map((suit) => (
+        <div key={suit} className="flex gap-2">
+          {RANKS.map((rank) => (
+            <Piece
+              key={rank}
+              id={`card:${rank}-${suit}`}
+              prefer="card-four-color"
+              size="auto"
+              className="h-24"
+            />
+          ))}
+        </div>
+      ))}
+      <div className="mt-4 flex gap-2">
+        <Piece id="card:back" prefer="card-four-color" size="auto" className="h-24" />
+        <Piece id="card:joker" prefer="card-four-color" size="auto" className="h-24" />
+      </div>
+    </div>
+  ),
+};
+
+/**
  * A realistic hand. Cards keep their 462:643 ratio from the manifest, so a row
  * spaces evenly — no letterboxing inside square boxes.
  */

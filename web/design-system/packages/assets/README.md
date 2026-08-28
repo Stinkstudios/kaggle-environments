@@ -127,7 +127,9 @@ reusable across games.
 
 ## Known gaps
 
-- Six families exist: `chess`, `board`, `fx`, `chess-fx`, `go` and `card`.
+- Seven families exist: `chess`, `board`, `fx`, `chess-fx`, `go`, `card` and
+  `card-four-color` — the last a variant family overlaying `card`, resolved with
+  `pieceAsset(id, { prefer })` rather than addressed directly.
   Discs/stones, dice and chips are the next highest-value ones (discs alone
   serve ~10 games).
 - Runtime tinting isn't implemented — no `tintable` family exists yet.

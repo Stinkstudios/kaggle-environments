@@ -67,6 +67,9 @@
       ],
       "card": [
         "./dist/generated/card.d.ts"
+      ],
+      "card-four-color": [
+        "./dist/generated/card-four-color.d.ts"
       ]
     }
   }

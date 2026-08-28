@@ -159,9 +159,37 @@ pnpm --filter @kaggle-environments/design-system-assets check:roster   # no deps
 | `chess-fx` | complete — 11 chess-only particles, atlas |
 | `go` | complete — 9 go-only pieces, atlas |
 | `card` | complete — 54 faces, individual files, DOM-only |
+| `card-four-color` | complete — variant family, 26 faces overlaying `card` |
 
 Runtime tinting is not implemented; no `tintable` family exists yet. It lands
 with the first one (discs).
+
+### Variant families
+
+`card-four-color` is the first **variant family**: it overlays another family
+and declares only the pieces that differ. The four-colour deck changes just
+diamonds (blue) and clubs (green), so it holds 26 faces — spades, hearts, the
+back and the joker stay in `card` rather than being copied. That keeps the art
+single-sourced: touch up a spade once and every deck gets it.
+
+Resolve one with `prefer`, passing the *base* id:
+
+```ts
+pieceAsset('card:a-club',  { prefer: 'card-four-color' }) // green club
+pieceAsset('card:a-spade', { prefer: 'card-four-color' }) // base deck spade
+```
+```tsx
+<Piece id={`card:${card}`} prefer="card-four-color" size="auto" className="h-48" />
+```
+
+Never address a variant family directly — `card-four-color:a-spade` is null,
+and always will be. The fallback is what lets a caller stay ignorant of which
+pieces the variant overrides.
+
+A variant family must keep its shared colours byte-identical to the family it
+overlays (for cards: `#f1f1f1` face, `#000000` ink, `#dcdcdb` fill), or the two
+will not intercut in one hand. Pick the deck once per game — `prefer` is a
+fixed choice, not a live setting, and nothing here is reactive.
 
 ## What to build next
 
