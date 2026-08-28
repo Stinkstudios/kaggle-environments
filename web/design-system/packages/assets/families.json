@@ -60,10 +60,18 @@
         "squiggle-dash": {
           "label": "dashed hand-drawn board line",
           "decorative": true
+        },
+        "hex-solid": {
+          "label": "hand-drawn hexagon cell outline",
+          "decorative": true
+        },
+        "hex-dash": {
+          "label": "dashed hand-drawn hexagon cell outline",
+          "decorative": true
         }
       },
       "targets": ["pixi", "dom"],
-      "$note": "No sourceSize: deliberately mixed-resolution. dark-tile is a 128x128 tile; squiggle-dash is a 74x4 strip tiled along each board line. Shared rather than game-scoped because board furniture is not any one game's art -- go draws the squiggle today and any board can. The Pixi renderer rotates one strip per line, so it needs no separate vertical variant; the DOM .squiggle-border in design-system-tokens does, because CSS cannot rotate a background image."
+      "$note": "No sourceSize: deliberately mixed-resolution. dark-tile is a 128x128 tile; squiggle-dash is a 74x4 strip tiled along each board line; hex-solid is a 302x348 closed hexagon outline. Shared rather than game-scoped because board furniture is not any one game's art -- go draws the squiggle today and any board can. The Pixi renderer rotates one strip per line, so it needs no separate vertical variant; the DOM .squiggle-border in design-system-tokens does, because CSS cannot rotate a background image. hex-solid is per-FACE art, not per-edge: a closed outline cannot feed latticeStrokes, so drawFaceSprites places one sprite per cell. Its master is pointy-top and drawFaceSprites rotates it for flat-top boards -- the same call the strip makes. hex-dash is declared but undrawn on purpose; naming the variant now is what stops a bare `hex` needing a coordinated rename the day the dashed art lands."
     },
     "fx": {
       "description": "Generic decorative particles, shared across games.",

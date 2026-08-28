@@ -1,5 +1,6 @@
 import { latticeStrokes, type Board, type Face, type Vec2 } from '@kaggle-environments/board';
-import { Container, Graphics, TilingSprite, type Texture } from 'pixi.js';
+import { Container, Graphics, Sprite, TilingSprite, type Texture } from 'pixi.js';
+import { faceRadius, hexRotation } from './hex';
 import { requireTexture, type TextureMap } from './textures';
 
 /**
@@ -148,6 +149,11 @@ export interface FacesOptions {
  * Uses `face.corners`, which are real final coordinates rather than a
  * centre/radius pair, so the polygon drawn is exactly the one the generator
  * laid out. Hex, rhombus and triangle extents need no special case here.
+ *
+ * This is the *programmatic* cell treatment. Where the design system has drawn
+ * artwork for the cell -- it has, for hexagons -- {@link drawFaceSprites} is the
+ * one to reach for; redrawing a hand-drawn outline with `Graphics.stroke` is
+ * exactly the substitution `skills/assets.md` rules out.
  */
 export function drawFaces(board: Board, options: FacesOptions = {}): Graphics {
   const { fill, fillAlpha = 1, stroke = null } = options;
@@ -163,6 +169,107 @@ export function drawFaces(board: Board, options: FacesOptions = {}): Graphics {
   });
 
   return graphics;
+}
+
+/**
+ * The cell treatments this design system offers -- for boards where the cells
+ * themselves are the artwork, rather than the lines between them.
+ *
+ * Named rather than parameterised for the same reason {@link GridStyleName} is:
+ * restyling every hex board in the repo should be a change here, not a change
+ * in N renderers.
+ *
+ * - `hex-solid` -- a hand-drawn hexagon outline, one per cell.
+ *
+ * The `-solid` suffix mirrors `squiggle-dash`: the same hand-drawn set has a
+ * dashed hexagon coming, and a bare `hex` would need renaming across every
+ * board the day it lands.
+ */
+export type FaceStyleName = 'hex-solid';
+
+export interface FaceSpritesOptions {
+  /** Defaults to `hex-solid`, the only cell style drawn so far. */
+  style?: FaceStyleName;
+  /**
+   * A loaded texture map to resolve the style's own artwork from. The style
+   * knows which asset it wants; the caller only has to have loaded the family.
+   */
+  textures?: TextureMap;
+  /** Or hand over artwork directly, overriding the style's own. */
+  texture?: Texture;
+  /**
+   * Tint. Left untinted by default. Note the masters are black on transparent,
+   * so a tint can only darken -- the family is not `tintable`.
+   */
+  color?: number;
+  alpha?: number;
+  /**
+   * Multiplier on the fitted size. The sprite is fitted to the cell's exact
+   * circumradius, but the artwork is cropped tight to the *outside* of a stroke
+   * with real width, which seats the drawn line marginally inside the cell.
+   * Nudge it here rather than by editing the master.
+   */
+  scale?: number;
+}
+
+const FACE_STYLE_ASSETS: Record<FaceStyleName, string> = { 'hex-solid': 'board:hex-solid' };
+const FACE_SPRITE_DEFAULTS = { color: 0xffffff, alpha: 1, scale: 1 };
+
+/**
+ * Draw the design system's hand-drawn cell artwork, one sprite per face.
+ *
+ * The counterpart to {@link drawGrid} for face lattices. It is a separate
+ * function rather than another `GridStyleName` because the two consume
+ * different geometry: `drawGrid` tiles a strip along the *merged runs* of
+ * `latticeStrokes`, and a closed outline cannot feed that -- there is no run to
+ * tile it along. This walks `board.faces` instead.
+ *
+ * Every interior edge belongs to two cells, so it is drawn twice, once by each
+ * neighbour. With hand-drawn art the two strokes do not coincide, which is the
+ * cell-by-cell look the artwork is going for -- but it does mean interior lines
+ * carry more weight than the boundary. `Board renderer/Hex cell styles` in
+ * Storybook shows it against the programmatic `drawFaces` stroke, so the call
+ * can be made by looking.
+ */
+export function drawFaceSprites(board: Board, options: FaceSpritesOptions = {}): Container {
+  const { textures, color, alpha, scale } = { ...FACE_SPRITE_DEFAULTS, ...options };
+  const style = options.style ?? 'hex-solid';
+  const assetId = FACE_STYLE_ASSETS[style];
+
+  const texture = options.texture ?? (textures ? requireTexture(textures, assetId) : undefined);
+  if (!texture) {
+    throw new Error(
+      `[board-renderer] the '${style}' cell style needs artwork. Pass \`textures\` ` +
+        `(having loaded the shared 'board' asset family, which carries ${assetId}), ` +
+        `or pass \`texture\` to override the style's own.`
+    );
+  }
+
+  const container = new Container();
+
+  for (const face of board.faces) {
+    // Pointing hex artwork at a square lattice silently draws hexagons over the
+    // squares, which survives review as "a style choice". Say what's wrong.
+    if (face.corners.length !== 6) {
+      throw new Error(
+        `[board-renderer] the '${style}' cell style needs hexagonal faces, but face ` +
+          `[${face.coord.join(', ')}] has ${face.corners.length} corners. Use drawFaces() for this board.`
+      );
+    }
+
+    const radius = faceRadius(face);
+
+    const sprite = new Sprite(texture);
+    sprite.anchor.set(0.5);
+    sprite.position.set(face.x, face.y);
+    sprite.scale.set(((2 * radius) / texture.height) * scale);
+    sprite.rotation = hexRotation(face);
+    sprite.tint = color;
+    sprite.alpha = alpha;
+    container.addChild(sprite);
+  }
+
+  return container;
 }
 
 /**

@@ -20,8 +20,8 @@ export type { TextureMap, LoadFamiliesOptions } from './textures';
 // the column-letter constants -- live in @kaggle-environments/board, so that a
 // Canvas2D renderer can use them without pulling PixiJS into its bundle.
 // Import them from there; this package deliberately does not re-export them.
-export { drawGrid, drawFaces, drawBorder } from './lattice';
-export type { GridOptions, GridStyleName, FacesOptions } from './lattice';
+export { drawGrid, drawFaces, drawFaceSprites, drawBorder } from './lattice';
+export type { GridOptions, GridStyleName, FacesOptions, FaceSpritesOptions, FaceStyleName } from './lattice';
 
 export { drawLabels } from './labels';
 export type { DrawLabelsOptions } from './labels';

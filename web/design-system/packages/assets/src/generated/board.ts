@@ -8,8 +8,9 @@ import boardAtlasUrl from '../../packed/board/board.webp';
 import boardAtlasData from '../../packed/board/board.webp.json';
 
 export const pieces: Record<string, PieceAsset> = {
-  'board:dark-tile': { id: 'board:dark-tile', family: 'board', url: null, atlasUrl: boardAtlasUrl, atlasSize: {"w":132,"h":138}, frame: {"x":2,"y":8,"w":128,"h":128}, sourceSize: {"w":128,"h":128}, label: "", decorative: true, tintable: false },
-  'board:squiggle-dash': { id: 'board:squiggle-dash', family: 'board', url: null, atlasUrl: boardAtlasUrl, atlasSize: {"w":132,"h":138}, frame: {"x":2,"y":2,"w":74,"h":4}, sourceSize: {"w":74,"h":4}, label: "", decorative: true, tintable: false },
+  'board:dark-tile': { id: 'board:dark-tile', family: 'board', url: null, atlasUrl: boardAtlasUrl, atlasSize: {"w":436,"h":358}, frame: {"x":306,"y":2,"w":128,"h":128}, sourceSize: {"w":128,"h":128}, label: "", decorative: true, tintable: false },
+  'board:hex-solid': { id: 'board:hex-solid', family: 'board', url: null, atlasUrl: boardAtlasUrl, atlasSize: {"w":436,"h":358}, frame: {"x":2,"y":8,"w":302,"h":348}, sourceSize: {"w":302,"h":348}, label: "", decorative: true, tintable: false },
+  'board:squiggle-dash': { id: 'board:squiggle-dash', family: 'board', url: null, atlasUrl: boardAtlasUrl, atlasSize: {"w":436,"h":358}, frame: {"x":2,"y":2,"w":74,"h":4}, sourceSize: {"w":74,"h":4}, label: "", decorative: true, tintable: false },
 };
 
 const family: FamilyInfo = {
@@ -17,10 +18,10 @@ const family: FamilyInfo = {
   targets: ["pixi","dom"],
   atlasUrl: boardAtlasUrl,
   atlasData: boardAtlasData,
-  atlasSize: {"w":132,"h":138},
+  atlasSize: {"w":436,"h":358},
   individual: false,
   pieces: Object.values(pieces),
-  missing: [],
+  missing: ["board:hex-dash"],
 };
 
 export default family;

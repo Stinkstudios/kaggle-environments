@@ -49,7 +49,7 @@ stage.layers.board.addChild(drawLabels(board, { offset: 25, text: … }));
   the touch-action fix, and an `AbortSignal` for the unmount-during-init case.
 - **`loadFamilies`** — asset families → textures keyed by stable id (`'go:b-stone'`),
   never by filename. `requireTexture` throws instead of drawing Pixi's white box.
-- **`drawGrid` / `drawFaces` / `drawBorder`** — board furniture, straight from the geometry.
+- **`drawGrid` / `drawFaces` / `drawFaceSprites` / `drawBorder`** — board furniture, straight from the geometry.
 - **`drawLabels`** — coordinate labels off `board.sides`.
 
 `drawGrid` and `drawLabels` are thin wrappers over `latticeStrokes` and
@@ -145,9 +145,50 @@ self-contained by design.
 whether that difference is intentional. The `Board line styles` Storybook entry
 puts them side by side so the call can be made by looking.
 
+### Hex cell styles
+
+Where the lines *are* the cell, the artwork is too. `drawFaceSprites` places one
+sprite per face:
+
+```ts
+drawFaceSprites(board, { textures });                       // board:hex-solid
+drawFaceSprites(board, { textures, scale: 1.02 });          // grow past the cell's extent
+```
+
+This is a separate function from `drawGrid` rather than another `GridStyleName`,
+because the two consume different geometry. `drawGrid` tiles a strip along the
+merged runs of `latticeStrokes`; `board:hex-solid` is a *closed outline* with no
+run to tile it along. It walks `board.faces` instead.
+
+One master serves both orientations. `hexRotation` reads the turn off the
+polygon's own corners — 0 for a pointy-top board, 30 degrees for a flat-top one
+— rather than off a board field, because `Board` does not carry the orientation
+it was generated with. A flipped or third-party lattice therefore still gets art
+that lines up. That is the same call the squiggle strip makes by rotating per
+run instead of shipping a vertical copy.
+
+Two things to know before using it:
+
+- **Interior edges are drawn twice**, once by each of the two cells that share
+  them, and two hand-drawn strokes do not coincide. That is the cell-by-cell
+  look the artwork is going for, but it does weight interior lines more heavily
+  than the boundary. `Hex cell styles → AgainstProgrammatic` puts it beside the
+  `drawFaces` stroke so the call can be made by looking.
+- **`scale` defaults to 1**, which fits the master's bounding box to the cell's.
+  The master is cropped tight to the *outside* of a stroke with real width, so
+  at 1 the drawn line seats marginally inside the cell and neighbouring outlines
+  pull apart rather than overlap — order of 1–2%. `Hex cell styles → Overlap` is
+  a slider over exactly that range; settle the default there rather than by
+  editing the artwork.
+
+`hex-dash` is declared in `families.json` but not drawn yet, so it lands in the
+`board` family's `missing[]` and `loadFamilies` warns about it in dev. That is
+the roster doing its job — pass `onMissing` to quieten it.
+
 ### Which drawer
 
-`drawGrid` strokes the lattice's **edges**; `drawFaces` fills its **cells**.
+`drawGrid` strokes the lattice's **edges**; `drawFaces` and `drawFaceSprites`
+draw its **cells** — programmatically and from artwork respectively.
 Which you want is the same question `board.primary` already answers — Go and
 Nine Men's Morris draw lines, Chess and every hex game draw cells. A hex board
 emits no edges at all, so `drawGrid` on one correctly draws nothing.
