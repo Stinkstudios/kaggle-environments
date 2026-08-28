@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { hexLattice, type Board } from '@kaggle-environments/board';
 import { Graphics } from 'pixi.js';
-import { drawBorder, drawFaces, type BoardRenderer } from '../index';
+import boardFamily from '@kaggle-environments/design-system-assets/board';
+import { drawBorder, drawFaceSprites, drawFaces, type BoardRenderer, type FaceStyleName } from '../index';
 import { BoardCanvas } from './board-canvas';
 
 /**
@@ -12,8 +13,14 @@ import { BoardCanvas } from './board-canvas';
  * for the other, Havannah counts its 6 corners and 6 sides, Y needs its 3
  * sides. `havannah/renderer.ts` currently hand-rolls that as `classifyCell`.
  *
- * Nothing here loads an asset family -- these boards are drawn entirely from
- * `face.corners` and `side.segments`.
+ * The cells are the design system's hand-drawn artwork; the outlines are pure
+ * geometry from `side.segments`. Both halves matter -- this is the closest thing
+ * here to how a real game composes them.
+ *
+ * These boards all pass `closeBoundary: false`. A half outline leaves half the
+ * board's perimeter undrawn, and normally you want it closed; here every side
+ * gets a coloured border stroked over it, so closing it would only double edges
+ * the border is about to cover. This is the case that option exists for.
  */
 const meta = {
   title: 'Board renderer/Hex (connection games)',
@@ -25,7 +32,6 @@ export default meta;
 const BOX = 460;
 const PADDING = 22;
 const CELL = 0xe8e2d5;
-const CELL_EDGE = 0x8a8172;
 
 const PLAYER_COLOURS = ['#d94f45', '#3d7ab8', '#57a05a', '#c9a227', '#8a5cb8', '#3fa89b'];
 
@@ -36,18 +42,29 @@ function HexDemo({
   sideColour,
   showCorners,
   caption,
+  style = 'hex-half-solid',
+  box = BOX,
 }: {
   board: Board;
   sideColour: (id: string, index: number) => number | null;
   showCorners?: boolean;
   caption: string;
+  style?: FaceStyleName;
+  box?: number;
 }) {
-  const options = useMemo(() => ({ board, layers: ['cells', 'borders'] as const }) as const, [board]);
+  const options = useMemo(
+    () => ({ board, layers: ['cells', 'borders'] as const, families: [boardFamily], mipmaps: true }) as const,
+    [board]
+  );
 
   const setup = useMemo(
     () => (renderer: BoardRenderer<Layer>) => {
+      // Fill programmatically, outline from the artwork. `drawFaces` still owns
+      // the fill -- there is no painted cell asset, and there does not need to
+      // be one.
+      renderer.layers.cells.addChild(drawFaces(board, { fill: () => CELL }));
       renderer.layers.cells.addChild(
-        drawFaces(board, { fill: () => CELL, stroke: { color: CELL_EDGE, width: 1, alpha: 0.6 } })
+        drawFaceSprites(board, { style, textures: renderer.textures, closeBoundary: false })
       );
 
       // `segments` are the outward-facing facets: a facet is a board boundary
@@ -72,12 +89,12 @@ function HexDemo({
         }
       }
     },
-    [board, sideColour, showCorners]
+    [board, sideColour, showCorners, style]
   );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: BOX }}>
-      <BoardCanvas options={options} setup={setup} display={BOX} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: box }}>
+      <BoardCanvas options={options} setup={setup} display={box} />
       <p style={{ margin: 0, fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#555' }}>{caption}</p>
     </div>
   );
@@ -160,4 +177,47 @@ export const FlatTop: StoryObj = {
       </div>
     );
   },
+};
+
+const SMALL = 300;
+const SMALL_PADDING = 16;
+
+/** The three extents, on one cell style, with their border groups. */
+function StyleRow({ style }: { style: FaceStyleName }) {
+  const rhombus = useMemo(
+    () =>
+      hexLattice({ extent: 'rhombus', rows: 9, cols: 9, fit: { width: SMALL, height: SMALL, padding: SMALL_PADDING } }),
+    []
+  );
+  const hexagon = useMemo(
+    () => hexLattice({ extent: 'hexagon', size: 6, fit: { width: SMALL, height: SMALL, padding: SMALL_PADDING } }),
+    []
+  );
+  const triangle = useMemo(
+    () => hexLattice({ extent: 'triangle', size: 9, fit: { width: SMALL, height: SMALL, padding: SMALL_PADDING } }),
+    []
+  );
+  const rainbow = (_id: string, index: number) => Number(PLAYER_COLOURS[index].replace('#', '0x'));
+
+  return (
+    <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <HexDemo board={rhombus} style={style} box={SMALL} sideColour={(id) => (id === 'n' || id === 's' ? 0xd94f45 : 0x3d7ab8)} caption="Hex — rhombus" />
+      <HexDemo board={hexagon} style={style} box={SMALL} sideColour={rainbow} caption="Havannah — hexagon" />
+      <HexDemo board={triangle} style={style} box={SMALL} sideColour={rainbow} caption="Y — triangle" />
+    </div>
+  );
+}
+
+/** Every connection game, drawn with the straight hand-drawn cell. */
+export const Straight: StoryObj = {
+  render: () => <StyleRow style="hex-half-solid" />,
+};
+
+/**
+ * The same three, dashed. Doubling would hurt most here -- two dashed strokes on
+ * one shared edge arrive at different phases and interleave -- which is why
+ * these draw the half rather than the whole outline.
+ */
+export const Dashed: StoryObj = {
+  render: () => <StyleRow style="hex-half-dash" />,
 };

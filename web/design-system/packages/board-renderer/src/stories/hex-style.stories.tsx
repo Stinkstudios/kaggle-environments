@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import boardFamily from '@kaggle-environments/design-system-assets/board';
-import { hexLattice, type Board, type HexExtent, type HexOrientation } from '@kaggle-environments/board';
+import { hexLattice, type Board } from '@kaggle-environments/board';
 import { drawFaceSprites, drawFaces, type BoardRenderer } from '../index';
 import { BoardCanvas } from './board-canvas';
 
@@ -59,15 +59,15 @@ function HexBoard({
   );
 }
 
-function useHexBoard(extent: HexExtent, orientation: HexOrientation, size = 4) {
+/**
+ * One board for every story here. Extents and orientations are exercised in
+ * `Hex (connection games)`, which shows them in a real game context; these
+ * stories are about the cell treatment, so they hold the board still.
+ */
+function useHexBoard() {
   return useMemo(
-    () =>
-      hexLattice(
-        extent === 'rhombus'
-          ? { extent, rows: size, cols: size, orientation, fit: { width: BOX, height: BOX, padding: PADDING } }
-          : { extent, size, orientation, fit: { width: BOX, height: BOX, padding: PADDING } }
-      ),
-    [extent, orientation, size]
+    () => hexLattice({ extent: 'hexagon', size: 4, fit: { width: BOX, height: BOX, padding: PADDING } }),
+    []
   );
 }
 
@@ -86,7 +86,7 @@ function useHexBoard(extent: HexExtent, orientation: HexOrientation, size = 4) {
  */
 export const CellStyles: StoryObj = {
   render: function Render() {
-    const board = useHexBoard('hexagon', 'pointy');
+    const board = useHexBoard();
     return (
       <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <HexBoard
@@ -133,7 +133,7 @@ export const CellStyles: StoryObj = {
  */
 export const SolidAndDashed: StoryObj = {
   render: function Render() {
-    const board = useHexBoard('hexagon', 'pointy');
+    const board = useHexBoard();
     return (
       <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
         <HexBoard
@@ -162,7 +162,7 @@ export const SolidAndDashed: StoryObj = {
 /** With and without the boundary closed, which is the `closeBoundary` call. */
 export const Boundary: StoryObj = {
   render: function Render() {
-    const board = useHexBoard('hexagon', 'pointy');
+    const board = useHexBoard();
     return (
       <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
         <HexBoard
@@ -183,49 +183,6 @@ export const Boundary: StoryObj = {
           }
           caption="closeBoundary: true (default)"
         />
-      </div>
-    );
-  },
-};
-
-/**
- * One master, both orientations. `hexRotation` reads the turn off the polygon's
- * own corners, so nothing here passes an orientation to the renderer.
- */
-export const BothOrientations: StoryObj = {
-  render: function Render() {
-    const pointy = useHexBoard('hexagon', 'pointy');
-    const flat = useHexBoard('hexagon', 'flat');
-    const draw = useMemo(
-      () => (renderer: BoardRenderer<Layer>, b: Board) =>
-        renderer.layers.board.addChild(drawFaceSprites(b, { style: 'hex-half-solid', textures: renderer.textures })),
-      []
-    );
-    return (
-      <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
-        <HexBoard board={pointy} draw={draw} caption="pointy-top — the master, unturned" />
-        <HexBoard board={flat} draw={draw} caption="flat-top — the same master, turned 30°" />
-      </div>
-    );
-  },
-};
-
-/** Every extent the hex generator emits, on the one cell style. */
-export const Extents: StoryObj = {
-  render: function Render() {
-    const hexagon = useHexBoard('hexagon', 'pointy');
-    const rhombus = useHexBoard('rhombus', 'pointy');
-    const triangle = useHexBoard('triangle', 'pointy', 6);
-    const draw = useMemo(
-      () => (renderer: BoardRenderer<Layer>, b: Board) =>
-        renderer.layers.board.addChild(drawFaceSprites(b, { style: 'hex-half-solid', textures: renderer.textures })),
-      []
-    );
-    return (
-      <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-        <HexBoard board={hexagon} draw={draw} caption="hexagon — havannah" />
-        <HexBoard board={rhombus} draw={draw} caption="rhombus — dark_hex" />
-        <HexBoard board={triangle} draw={draw} caption="triangle — y" />
       </div>
     );
   },
