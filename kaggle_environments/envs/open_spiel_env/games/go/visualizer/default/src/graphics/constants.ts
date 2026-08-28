@@ -1,5 +1,6 @@
 import type { FamilyInfo } from '@kaggle-environments/design-system-assets';
 import goFamily from '@kaggle-environments/design-system-assets/go';
+import boardFamily from '@kaggle-environments/design-system-assets/board';
 import fxFamily from '@kaggle-environments/design-system-assets/fx';
 import type { CellValue, GridPos } from '../types/game';
 
@@ -85,7 +86,10 @@ export function getNeighbors(row: number, col: number, boardSize: number): GridP
 /**
  * Asset families this visualizer loads at start-up.
  *
- * `go` is this game's own art — stones, board furniture and territory marks.
+ * `go` is this game's own art — stones, markers and territory marks. `board`
+ * carries the shared board furniture: the hand-drawn grid line moved there from
+ * the `go` family, because board lines are not any one game's art and filing
+ * them per-game is what kept other boards from reaching them.
  * `fx` is the shared particle family: the three capture puffs are byte-identical
  * to chess's, which is what earned them a place outside a game-scoped family.
  *
@@ -95,7 +99,7 @@ export function getNeighbors(row: number, col: number, boardSize: number): GridP
  * ever draws. Naming each family as an import keeps the bundle honest: what you
  * see here is what ships.
  */
-export const ASSET_FAMILIES: FamilyInfo[] = [goFamily, fxFamily];
+export const ASSET_FAMILIES: FamilyInfo[] = [goFamily, boardFamily, fxFamily];
 
 /** Board cell values -> the colour prefix used in the shared asset id vocabulary. */
 const COLOR_PREFIX: Record<Exclude<CellValue, '.'>, string> = { B: 'b', W: 'w' };
@@ -119,7 +123,7 @@ export function territoryId(value: Exclude<CellValue, '.'>): string {
 /** Single-variant ids, named here so no module has to spell them by hand. */
 export const SHADOW_ID = 'go:shadow';
 export const HOSHI_ID = 'go:hoshi';
-export const GRID_LINE_ID = 'go:grid-line';
+export const GRID_LINE_ID = 'board:squiggle-dash';
 
 /** The shared capture-puff particles, drawn from at random on capture. */
 export const PUFF_IDS = ['fx:puff1', 'fx:puff2', 'fx:puff3'] as const;

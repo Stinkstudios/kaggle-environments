@@ -47,36 +47,28 @@
           "label": "black pawn"
         }
       },
-      "targets": [
-        "pixi",
-        "dom"
-      ]
+      "targets": ["pixi", "dom"]
     },
     "board": {
-      "description": "Board surface textures",
-      "sourceSize": {
-        "w": 128,
-        "h": 128
-      },
+      "description": "Board surface textures and hand-drawn board lines",
       "tintable": false,
       "pieces": {
         "dark-tile": {
           "label": "dark square",
           "decorative": true
+        },
+        "squiggle-dash": {
+          "label": "dashed hand-drawn board line",
+          "decorative": true
         }
       },
-      "targets": [
-        "pixi",
-        "dom"
-      ]
+      "targets": ["pixi", "dom"],
+      "$note": "No sourceSize: deliberately mixed-resolution. dark-tile is a 128x128 tile; squiggle-dash is a 74x4 strip tiled along each board line. Shared rather than game-scoped because board furniture is not any one game's art -- go draws the squiggle today and any board can. The Pixi renderer rotates one strip per line, so it needs no separate vertical variant; the DOM .squiggle-border in design-system-tokens does, because CSS cannot rotate a background image."
     },
     "fx": {
       "description": "Generic decorative particles, shared across games.",
       "tintable": false,
-      "targets": [
-        "pixi",
-        "dom"
-      ],
+      "targets": ["pixi", "dom"],
       "$note": "Only art proven to be used by more than one game lives here. The three puffs are byte-identical between the chess and go visualizers, which is what earns them a place in a shared family.",
       "pieces": {
         "puff1": {
@@ -93,10 +85,7 @@
     "chess-fx": {
       "description": "Chess's own motion particles. Not reusable \u2014 several are piece silhouettes.",
       "tintable": false,
-      "targets": [
-        "pixi",
-        "dom"
-      ],
+      "targets": ["pixi", "dom"],
       "$note": "Game-scoped on purpose. rook1-4, bishop1-2, pawn and knight-shadow are silhouettes of chess pieces; squiggle-1..3 are the king trail. Naming these generically would invite another game to import a rook outline as \"decoration\".",
       "pieces": {
         "squiggle-1": {
@@ -135,13 +124,10 @@
       }
     },
     "go": {
-      "description": "Go stones, board furniture and territory overlays",
+      "description": "Go stones, markers and territory overlays",
       "tintable": false,
-      "targets": [
-        "pixi",
-        "dom"
-      ],
-      "$note": "No sourceSize: this family is deliberately mixed-resolution. The stones are 256×256 masters, the shadow 128, markers 88, territory marks 84, hoshi 48, and grid-line is a 74×4 strip tiled along each board line. Every piece is drawn to a size that suits its job and is scaled at render time, so declaring one ratio for the family would be a lie the build would enforce. The three capture puffs are NOT here — they are byte-identical to chess's and live in the shared `fx` family.",
+      "targets": ["pixi", "dom"],
+      "$note": "No sourceSize: this family is deliberately mixed-resolution. The stones are 256\u00d7256 masters, the shadow 128, markers 88, territory marks 84 and hoshi 48. Every piece is drawn to a size that suits its job and is scaled at render time, so declaring one ratio for the family would be a lie the build would enforce. The three capture puffs are NOT here \u2014 they are byte-identical to chess's and live in the shared `fx` family.",
       "pieces": {
         "b-stone": {
           "label": "black stone"
@@ -166,9 +152,6 @@
         },
         "hoshi": {
           "decorative": true
-        },
-        "grid-line": {
-          "decorative": true
         }
       }
     },
@@ -181,7 +164,7 @@
       "tintable": false,
       "individual": true,
       "atlas": false,
-      "$note": "targets:[\"dom\"] + atlas:false — every card game here (gin_rummy, bridge_arena, repeated_poker) is DOM and shows a hand at a time, so per-card files are the right shape. If a Pixi card game ever appears, add \"pixi\" to targets and set atlas:true: all 54 fit one 4096 sheet at 419x583 (9x7=63 slots, 91% of source), so this is a downscale decision, not a multi-page one.",
+      "$note": "targets:[\"dom\"] + atlas:false \u2014 every card game here (gin_rummy, bridge_arena, repeated_poker) is DOM and shows a hand at a time, so per-card files are the right shape. If a Pixi card game ever appears, add \"pixi\" to targets and set atlas:true: all 54 fit one 4096 sheet at 419x583 (9x7=63 slots, 91% of source), so this is a downscale decision, not a multi-page one.",
       "pieces": {
         "a-spade": {
           "label": "ace of spades"
@@ -346,9 +329,7 @@
           "label": "joker"
         }
       },
-      "targets": [
-        "dom"
-      ]
+      "targets": ["dom"]
     }
   }
 }
