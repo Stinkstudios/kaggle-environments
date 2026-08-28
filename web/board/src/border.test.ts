@@ -128,3 +128,110 @@ describe('square border', () => {
     expect(go.sides.every((side) => side.segments.length === 0)).toBe(true);
   });
 });
+
+describe('border ids under flip', () => {
+  // A compass id is a claim about where a side sits on screen, so flipping the
+  // board has to mirror the names too -- otherwise `'n'` names the bottom edge.
+  // havannah needs `flip: { y: true }`, so this is load-bearing, not cosmetic.
+  const plain = hexLattice({ extent: 'hexagon', size: 5, fit: { width: 400, height: 400 } });
+  const flipped = hexLattice({ extent: 'hexagon', size: 5, fit: { width: 400, height: 400 }, flip: { y: true } });
+
+  it('mirrors north and south', () => {
+    expect(ids(flipped.sides).sort()).toEqual(ids(plain.sides).sort());
+    expect(ids(flipped.corners).sort()).toEqual(ids(plain.corners).sort());
+  });
+
+  it('keeps every named side on the screen edge its name claims', () => {
+    for (const board of [plain, flipped]) {
+      const north = midpoints(board.sides.find((side) => side.id === 'n')!);
+      const south = midpoints(board.sides.find((side) => side.id === 's')!);
+      expect(Math.max(...north.map((p) => p.y))).toBeLessThan(Math.min(...south.map((p) => p.y)));
+    }
+  });
+
+  it('keeps corners on the screen edge their name claims', () => {
+    for (const board of [plain, flipped]) {
+      const west = board.corners.find((corner) => corner.id === 'w')!.elements[0];
+      const east = board.corners.find((corner) => corner.id === 'e')!.elements[0];
+      expect(west.x).toBeLessThan(east.x);
+      const nne = board.corners.find((corner) => corner.id === 'nne')!.elements[0];
+      const sse = board.corners.find((corner) => corner.id === 'sse')!.elements[0];
+      expect(nne.y).toBeLessThan(sse.y);
+    }
+  });
+
+  it('points a flipped group at the cell that is actually there', () => {
+    // Unflipped, r = -radius is the top row. Flipped, that same row renders at
+    // the bottom, so it must now be called 's'.
+    expect(plain.sides.find((s) => s.id === 'n')!.elements).toContain(plain.faceAt([0, -4]));
+    expect(flipped.sides.find((s) => s.id === 's')!.elements).toContain(flipped.faceAt([0, -4]));
+  });
+});
+
+describe('face winding under flip', () => {
+  // Mirroring one axis reverses polygon winding. Consumers that stroke a dashed
+  // or gradient-filled outline depend on direction, so the winding a generator
+  // chose has to survive `flip`.
+  const signedArea = (corners: readonly { x: number; y: number }[]) =>
+    corners.reduce((sum, corner, i) => {
+      const next = corners[(i + 1) % corners.length];
+      return sum + (corner.x * next.y - next.x * corner.y);
+    }, 0);
+
+  const plain = hexLattice({ extent: 'hexagon', size: 5, fit: { width: 400, height: 400 } });
+
+  it('keeps the same winding when one axis is mirrored', () => {
+    for (const flip of [{ y: true }, { x: true }]) {
+      const flipped = hexLattice({ extent: 'hexagon', size: 5, fit: { width: 400, height: 400 }, flip });
+      expect(Math.sign(signedArea(flipped.faceAt([0, 0])!.corners))).toBe(
+        Math.sign(signedArea(plain.faceAt([0, 0])!.corners))
+      );
+    }
+  });
+
+  it('keeps it when both axes are mirrored, which is a rotation', () => {
+    const rotated = hexLattice({
+      extent: 'hexagon',
+      size: 5,
+      fit: { width: 400, height: 400 },
+      flip: { x: true, y: true },
+    });
+    expect(Math.sign(signedArea(rotated.faceAt([0, 0])!.corners))).toBe(
+      Math.sign(signedArea(plain.faceAt([0, 0])!.corners))
+    );
+  });
+
+  it('holds for square boards too', () => {
+    const flipped = squareLattice({ cells: { rows: 4, cols: 4 }, fit: { width: 400, height: 400 }, flip: { x: true } });
+    const straight = squareLattice({ cells: { rows: 4, cols: 4 }, fit: { width: 400, height: 400 } });
+    expect(Math.sign(signedArea(flipped.faceAt([0, 0])!.corners))).toBe(
+      Math.sign(signedArea(straight.faceAt([0, 0])!.corners))
+    );
+  });
+});
+
+describe('border segments survive a flip', () => {
+  // Reversing winding without reversing the vertex ids alongside it would leave
+  // each facet's endpoints paired with the wrong corners -- adjacency would still
+  // look fine while every drawn goal marker silently moved.
+  const board = hexLattice({ extent: 'hexagon', size: 5, fit: { width: 400, height: 400 }, flip: { y: true } });
+
+  it('still emits only true boundary facets', () => {
+    for (const side of board.sides) {
+      for (const [a, b] of side.segments) {
+        const midpoint = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+        const near = board.faces.filter(
+          (face) => Math.hypot(face.x - midpoint.x, face.y - midpoint.y) < board.pitch * 0.55
+        );
+        expect(near).toHaveLength(1);
+      }
+    }
+  });
+
+  it('still gives every facet the length of a cell side', () => {
+    const expected = board.pitch / Math.sqrt(3);
+    for (const side of board.sides) {
+      for (const [a, b] of side.segments) expect(Math.hypot(b.x - a.x, b.y - a.y)).toBeCloseTo(expected, 6);
+    }
+  });
+});

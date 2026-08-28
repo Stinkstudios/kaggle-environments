@@ -259,7 +259,12 @@ export function createBoard(unit: UnitLattice, options: CreateBoardOptions = {})
   const faceIndexById = new Map<string, number>();
 
   unit.faces.forEach((source, faceIndex) => {
+    // Mirroring one axis reverses a polygon's winding. Re-reversing keeps the
+    // winding the generator chose stable regardless of `flip`, which matters to
+    // anything directional along the path -- dash phase, gradients, arrowheads.
+    // Reverse before deriving anything, so corners and vertex ids stay in step.
     const normalized = source.corners.map((corner) => normalize(corner.x, corner.y));
+    if (!!flip?.x !== !!flip?.y) normalized.reverse();
     const vertexIds = normalized.map((corner) => vertices.idFor(corner.x, corner.y));
     const corners = normalized.map(place);
     for (let i = 0; i < vertexIds.length; i++) {
@@ -309,10 +314,27 @@ export function createBoard(unit: UnitLattice, options: CreateBoardOptions = {})
 
   // 7. Border groups, resolved against whichever element kind the board plays on.
   const byCoord = unit.primary === 'face' ? facesByCoord : pointsByCoord;
+
+  // Generators name border groups from the unflipped lattice, but a compass id
+  // is a claim about where a side ends up *on screen*. Mirroring the letters
+  // keeps that claim true under `flip` -- and matters twice over, because the
+  // direction derived from the id is what assigns a corner cell's outward
+  // facets to the right side.
+  const mirrorId = (id: string) =>
+    [...id]
+      .map((letter) => {
+        if (flip?.y && letter === 'n') return 's';
+        if (flip?.y && letter === 's') return 'n';
+        if (flip?.x && letter === 'e') return 'w';
+        if (flip?.x && letter === 'w') return 'e';
+        return letter;
+      })
+      .join('');
+
   const resolveBorder = (groups: UnitBorder['sides']): BorderGroup[] => {
     const resolved = groups.map((group) => ({
-      id: group.id,
-      direction: compassDirection(group.id),
+      id: mirrorId(group.id),
+      direction: compassDirection(mirrorId(group.id)),
       elements: group.coords.map((coord) => {
         const element = byCoord.get(coordKey(coord));
         if (!element) {
