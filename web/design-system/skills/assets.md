@@ -67,7 +67,7 @@ const { atlasUrl, atlasData, pieces, missing } = goFamily;
 | Family | ids | Output | Notes |
 | --- | --- | --- | --- |
 | `chess` | `chess:{w,b}-{king,queen,rook,bishop,knight,pawn}` | atlas | 256×256, 12 pieces |
-| `board` | `board:dark-tile`, `board:squiggle-dash` | atlas | shared board furniture; mixed sizes |
+| `board` | `board:dark-tile`, `board:squiggle-dash`, `board:hex-{solid,dash}`, `board:hex-half-{solid,dash}` | atlas | shared board furniture; mixed sizes. Boards draw the *half* — it tiles without doubling shared edges, which matters most for the dashed set |
 | `fx` | `fx:puff1-3` | atlas | shared decorative particles |
 | `chess-fx` | `chess-fx:{squiggle-1-3,rook1-4,bishop1-2,pawn,knight-shadow}` | atlas | chess-only, game-scoped |
 | `go` | `go:{b,w}-{stone,marker,territory}`, `go:{shadow,hoshi}` | atlas | go-only, game-scoped; mixed sizes |

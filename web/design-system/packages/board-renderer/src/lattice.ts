@@ -1,5 +1,6 @@
 import { latticeStrokes, type Board, type Face, type Vec2 } from '@kaggle-environments/board';
-import { Container, Graphics, TilingSprite, type Texture } from 'pixi.js';
+import { Container, Graphics, Sprite, TilingSprite, type Texture } from 'pixi.js';
+import { complementFaces, faceRadius, hexArtFit, hexRotation, type HexArtMaster } from './hex';
 import { requireTexture, type TextureMap } from './textures';
 
 /**
@@ -148,6 +149,11 @@ export interface FacesOptions {
  * Uses `face.corners`, which are real final coordinates rather than a
  * centre/radius pair, so the polygon drawn is exactly the one the generator
  * laid out. Hex, rhombus and triangle extents need no special case here.
+ *
+ * This is the *programmatic* cell treatment. Where the design system has drawn
+ * artwork for the cell -- it has, for hexagons -- {@link drawFaceSprites} is the
+ * one to reach for; redrawing a hand-drawn outline with `Graphics.stroke` is
+ * exactly the substitution `skills/assets.md` rules out.
  */
 export function drawFaces(board: Board, options: FacesOptions = {}): Graphics {
   const { fill, fillAlpha = 1, stroke = null } = options;
@@ -163,6 +169,157 @@ export function drawFaces(board: Board, options: FacesOptions = {}): Graphics {
   });
 
   return graphics;
+}
+
+/**
+ * The cell treatments this design system offers -- for boards where the cells
+ * themselves are the artwork, rather than the lines between them.
+ *
+ * Named rather than parameterised for the same reason {@link GridStyleName} is:
+ * restyling every hex board in the repo should be a change here, not a change
+ * in N renderers.
+ *
+ * - `hex-solid` / `hex-dash` -- a hand-drawn hexagon outline, one per cell.
+ * - `hex-half-solid` / `hex-half-dash` -- three contiguous edges of it, so a
+ *   tiling draws each shared edge once rather than twice. Half the sprites, and
+ *   interior lines stop carrying more weight than the boundary.
+ *
+ * **Boards want a `-half-` style.** The whole outline is right for a cell shown
+ * on its own, and that is about all. The case is stronger for `dash` than for
+ * `solid`: two doubled solid strokes merge into one slightly heavier line, but
+ * two doubled *dashed* strokes arrive at different phases -- the two cells
+ * present opposite edges of the artwork to the same lattice edge, traversed in
+ * opposite directions -- so the dashes interleave rather than coincide.
+ */
+export type FaceStyleName = 'hex-solid' | 'hex-half-solid' | 'hex-dash' | 'hex-half-dash';
+
+export interface FaceSpritesOptions {
+  /** Defaults to `hex-solid`, the only cell style drawn so far. */
+  style?: FaceStyleName;
+  /**
+   * A loaded texture map to resolve the style's own artwork from. The style
+   * knows which asset it wants; the caller only has to have loaded the family.
+   */
+  textures?: TextureMap;
+  /** Or hand over artwork directly, overriding the style's own. */
+  texture?: Texture;
+  /**
+   * Tint. Left untinted by default. Note the masters are black on transparent,
+   * so a tint can only darken -- the family is not `tintable`.
+   */
+  color?: number;
+  alpha?: number;
+  /**
+   * Multiplier on the fitted size. Defaults to {@link HEX_ART_FIT}, which seats
+   * the drawn stroke's *centreline* on the cell boundary so neighbouring
+   * outlines meet rather than leaving a gap -- fitting the raw canvas draws the
+   * hexagon 2.5% small, because the master is cropped to the outside of a stroke
+   * with real width. Pass 1 to see the uncorrected fit. Nudge it here rather
+   * than by editing the master.
+   */
+  scale?: number;
+  /**
+   * For a half style, also draw the complement -- the same artwork turned 180
+   * degrees -- on cells that have an outside edge, closing the board's outline.
+   * Defaults to true, because an open outline reads as unfinished.
+   *
+   * Set false when the game draws its own border. Every hex game here is a
+   * connection game that already does: `dark_hex` colours n/s and e/w,
+   * `havannah` needs its 6 sides and 6 corners, `y` its 3 -- all of which come
+   * off `board.sides` via {@link drawBorder}. Doubling a boundary the game is
+   * about to draw over is worth avoiding.
+   *
+   * Ignored by whole-outline styles, which have no boundary to close.
+   */
+  closeBoundary?: boolean;
+}
+
+interface FaceStyle {
+  /** Asset id in the shared `board` family. */
+  asset: string;
+  /** Which master it was drawn on -- decides the fit, which is per-master. */
+  master: HexArtMaster;
+  /** Draws a partial outline, so the board's boundary needs closing. */
+  half: boolean;
+}
+
+const FACE_STYLES: Record<FaceStyleName, FaceStyle> = {
+  'hex-solid': { asset: 'board:hex-solid', master: 'solid', half: false },
+  'hex-half-solid': { asset: 'board:hex-half-solid', master: 'solid', half: true },
+  'hex-dash': { asset: 'board:hex-dash', master: 'dash', half: false },
+  'hex-half-dash': { asset: 'board:hex-half-dash', master: 'dash', half: true },
+};
+const FACE_SPRITE_DEFAULTS = { color: 0xffffff, alpha: 1, closeBoundary: true };
+
+/**
+ * Draw the design system's hand-drawn cell artwork, one sprite per face.
+ *
+ * The counterpart to {@link drawGrid} for face lattices. It is a separate
+ * function rather than another `GridStyleName` because the two consume
+ * different geometry: `drawGrid` tiles a strip along the *merged runs* of
+ * `latticeStrokes`, and a closed outline cannot feed that -- there is no run to
+ * tile it along. This walks `board.faces` instead.
+ *
+ * Every interior edge belongs to two cells, so it is drawn twice, once by each
+ * neighbour. With hand-drawn art the two strokes do not coincide, which is the
+ * cell-by-cell look the artwork is going for -- but it does mean interior lines
+ * carry more weight than the boundary. `Board renderer/Hex cell styles` in
+ * Storybook shows it against the programmatic `drawFaces` stroke, so the call
+ * can be made by looking.
+ */
+export function drawFaceSprites(board: Board, options: FaceSpritesOptions = {}): Container {
+  const { textures, color, alpha, closeBoundary } = { ...FACE_SPRITE_DEFAULTS, ...options };
+  const style = options.style ?? 'hex-half-solid';
+  const { asset, master, half } = FACE_STYLES[style];
+  // The fit is per-master, so it cannot live in the defaults object.
+  const scale = options.scale ?? hexArtFit(master);
+
+  const texture = options.texture ?? (textures ? requireTexture(textures, asset) : undefined);
+  if (!texture) {
+    throw new Error(
+      `[board-renderer] the '${style}' cell style needs artwork. Pass \`textures\` ` +
+        `(having loaded the shared 'board' asset family, which carries ${asset}), ` +
+        `or pass \`texture\` to override the style's own.`
+    );
+  }
+
+  const container = new Container();
+  const complement = half && closeBoundary ? complementFaces(board) : null;
+
+  board.faces.forEach((face, index) => {
+    // Pointing hex artwork at a square lattice silently draws hexagons over the
+    // squares, which survives review as "a style choice". Say what's wrong.
+    if (face.corners.length !== 6) {
+      throw new Error(
+        `[board-renderer] the '${style}' cell style needs hexagonal faces, but face ` +
+          `[${face.coord.join(', ')}] has ${face.corners.length} corners. Use drawFaces() for this board.`
+      );
+    }
+
+    const radius = faceRadius(face);
+
+    const sprite = new Sprite(texture);
+    sprite.anchor.set(0.5);
+    sprite.position.set(face.x, face.y);
+    sprite.scale.set(((2 * radius) / texture.height) * scale);
+    sprite.rotation = hexRotation(face);
+    sprite.tint = color;
+    sprite.alpha = alpha;
+    container.addChild(sprite);
+
+    if (complement?.has(index)) {
+      const other = new Sprite(texture);
+      other.anchor.set(0.5);
+      other.position.set(face.x, face.y);
+      other.scale.set(sprite.scale.x);
+      other.rotation = sprite.rotation + Math.PI;
+      other.tint = color;
+      other.alpha = alpha;
+      container.addChild(other);
+    }
+  });
+
+  return container;
 }
 
 /**

@@ -49,7 +49,7 @@ stage.layers.board.addChild(drawLabels(board, { offset: 25, text: … }));
   the touch-action fix, and an `AbortSignal` for the unmount-during-init case.
 - **`loadFamilies`** — asset families → textures keyed by stable id (`'go:b-stone'`),
   never by filename. `requireTexture` throws instead of drawing Pixi's white box.
-- **`drawGrid` / `drawFaces` / `drawBorder`** — board furniture, straight from the geometry.
+- **`drawGrid` / `drawFaces` / `drawFaceSprites` / `drawBorder`** — board furniture, straight from the geometry.
 - **`drawLabels`** — coordinate labels off `board.sides`.
 
 `drawGrid` and `drawLabels` are thin wrappers over `latticeStrokes` and
@@ -145,9 +145,99 @@ self-contained by design.
 whether that difference is intentional. The `Board line styles` Storybook entry
 puts them side by side so the call can be made by looking.
 
+### Hex cell styles
+
+Where the lines *are* the cell, the artwork is too. `drawFaceSprites` places one
+sprite per face:
+
+```ts
+drawFaceSprites(board, { textures });                          // hex-half-solid, the default
+drawFaceSprites(board, { style: 'hex-half-dash', textures });  // the dashed set
+drawFaceSprites(board, { style: 'hex-solid', textures });      // one cell, drawn whole
+```
+
+Four styles: `hex-solid` / `hex-dash` draw the whole outline, `hex-half-solid` /
+`hex-half-dash` draw three contiguous edges. **The default is `hex-half-solid`**
+— a board almost always wants a half, and the whole outline is really only right
+for a cell shown on its own.
+
+This is a separate function from `drawGrid` rather than another `GridStyleName`,
+because the two consume different geometry. `drawGrid` tiles a strip along the
+merged runs of `latticeStrokes`; `board:hex-solid` is a *closed outline* with no
+run to tile it along. It walks `board.faces` instead.
+
+One master serves both orientations. `hexRotation` reads the turn off the
+polygon's own corners — 0 for a pointy-top board, 30 degrees for a flat-top one
+— rather than off a board field, because `Board` does not carry the orientation
+it was generated with. A flipped or third-party lattice therefore still gets art
+that lines up. That is the same call the squiggle strip makes by rotating per
+run instead of shipping a vertical copy.
+
+### Halves, and why they are the default for a board
+
+A whole outline per cell draws every interior edge twice — 462 of 552 edges on a
+size-8 Havannah board. That is worse for `dash` than for `solid`: two doubled
+solid strokes merge into one slightly heavier line, but two doubled dashed
+strokes arrive at different phases and interleave, because the two cells present
+opposite edges of the artwork to the same lattice edge and traverse them in
+opposite directions.
+`hex-half-solid` carries three contiguous edges instead, and the three
+neighbours draw the rest: each shared edge lands exactly once, for half the
+sprites. Verified across every extent, both orientations and a flipped board.
+
+The other half is the same file turned 180 degrees; there is no second asset.
+
+What one half per cell *cannot* cover is an erased edge with no neighbour behind
+it, so half the board's outline goes missing. `closeBoundary` (default true)
+draws the complement on those cells. It re-doubles any of that cell's other
+erased edges that do have a neighbour — 42 of 552 edges, against 462 — and that
+is the price of working in halves rather than single edges. Set it false when
+the game draws its own border off `board.sides`, which every hex game here does.
+
+Two implementation notes, both load-bearing:
+
+- **The fit constant is per master, not global.** `hex-solid` is 302×348 with
+  the ink flush to the edges; `hex-dash` is 304×353 with a little padding, and
+  its stroke centreline sits at a different fraction of the canvas (0.9641 vs
+  0.9754). Using one number for both would draw the dashed board 1.2% small and
+  reopen the gap at every shared edge. A `-half-` variant is cut from its whole
+  counterpart, so it inherits that canvas and that number. If future variants are
+  exported from a shared artboard this collapses back to one constant.
+- **The atlas must stay untrimmed.** The fit maps the master's *canvas* to the
+  cell, so a trimmed frame would scale and seat the art wrongly — and the half
+  is mostly empty canvas, so it is the first thing to break. `allowTrim: false`
+  in `assetpack.config.mjs` is what holds this up.
+- **`hexRotation` biases its half-step comparison.** A flat-top board lands
+  exactly on the boundary, where floating-point noise otherwise sends some faces
+  to +30 degrees and the rest to −30. Both draw an identical hexagon, so a whole
+  outline never notices; a half does, and a board mixing them tiles wrong.
+
+Two things to know before using it:
+
+- **Interior edges are drawn twice** with `hex-solid`, once by each of the two cells that share
+  them, and two hand-drawn strokes do not coincide. That is the cell-by-cell
+  look the artwork is going for, but it does weight interior lines more heavily
+  than the boundary. How much that actually shows depends entirely on `scale`
+  being right: at the wrong fit the two strokes separate into tram-lines, and at
+  `HEX_ART_FIT` they overlap into one slightly heavier line. Judge it at the
+  correct fit. `Hex cell styles → AgainstProgrammatic` puts it beside the
+  `drawFaces` stroke so the call can be made by looking.
+- **`scale` defaults to `HEX_ART_FIT` (≈1.025), not 1.** The master is cropped
+  to the *outside* of a stroke with real width, so fitting the raw canvas to the
+  cell draws the hexagon at 97.5% and leaves a visible gap at every shared edge.
+  The constant is measured off the artwork — the alpha-weighted mean projection
+  onto each of the six edge normals, which agree to within 0.24% — and seats the
+  stroke's centreline on the cell boundary so neighbours meet. Pass `scale: 1`
+  to see the uncorrected fit; `Hex cell styles → Overlap` slides across it.
+
+`hex-dash` is declared in `families.json` but not drawn yet, so it lands in the
+`board` family's `missing[]` and `loadFamilies` warns about it in dev. That is
+the roster doing its job — pass `onMissing` to quieten it.
+
 ### Which drawer
 
-`drawGrid` strokes the lattice's **edges**; `drawFaces` fills its **cells**.
+`drawGrid` strokes the lattice's **edges**; `drawFaces` and `drawFaceSprites`
+draw its **cells** — programmatically and from artwork respectively.
 Which you want is the same question `board.primary` already answers — Go and
 Nine Men's Morris draw lines, Chess and every hex game draw cells. A hex board
 emits no edges at all, so `drawGrid` on one correctly draws nothing.
