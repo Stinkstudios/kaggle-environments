@@ -1,0 +1,24 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "noEmit": false,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    // The base config maps @kaggle-environments/board straight at board's
+    // *source*, which is right for a visualizer (noEmit, vite-tsconfig-paths)
+    // but not for a composite library: it drags another package's .ts files
+    // into this program and trips rootDir. Cleared so both workspace deps
+    // resolve through node_modules to the .d.ts the references below build.
+    "paths": {}
+  },
+  "references": [{ "path": "../../../board" }, { "path": "../assets" }],
+  "include": ["src"],
+  // Stories are dev-only tooling, not part of the published package. Storybook
+  // type-checks and transforms them itself (esbuild, no tsc), and
+  // @storybook/react-vite's package exports don't resolve under this config's
+  // moduleResolution -- which would otherwise break `pnpm build`. Same
+  // exclusion, for the same reason, as design-system-components.
+  "exclude": ["src/**/*.test.ts", "src/stories/**"]
+}
