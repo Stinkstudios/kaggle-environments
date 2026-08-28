@@ -13,6 +13,27 @@ import type { Face } from '@kaggle-environments/board';
  */
 export const HEX_ASSET_VERTEX_ANGLE = -Math.PI / 2;
 
+/**
+ * Where the master's stroke *centreline* sits, as a fraction of the canvas's
+ * half-height.
+ *
+ * The artwork is cropped to the outside of a stroke with real width, so fitting
+ * the canvas to the cell seats the drawn line inside it and neighbouring
+ * outlines never touch. Measured off `hex-solid.png` by taking the
+ * alpha-weighted mean projection onto each of the six edge normals, sampling
+ * only the flat middle of each edge so the vertices don't skew it: the six agree
+ * to within 0.24%, giving a centreline circumradius of 169.72 against a canvas
+ * half-height of 174.
+ *
+ * Fitting the canvas would therefore draw the hexagon at 97.5% of the cell and
+ * leave a 2.5% gap at every shared edge. {@link HEX_ART_FIT} is the reciprocal
+ * that cancels it, and is the default `scale` the style ships with.
+ */
+export const HEX_ART_CENTRELINE_RATIO = 169.72 / 174;
+
+/** Scale that seats the drawn centreline on the cell boundary. */
+export const HEX_ART_FIT = 1 / HEX_ART_CENTRELINE_RATIO;
+
 /** A hexagon maps onto itself every 60 degrees. */
 export const HEX_SYMMETRY = Math.PI / 3;
 

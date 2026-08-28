@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { hexLattice } from '@kaggle-environments/board';
-import { faceRadius, hexRotation } from './hex';
+import { faceRadius, HEX_ART_CENTRELINE_RATIO, HEX_ART_FIT, hexRotation } from './hex';
 
 const DEGREES = 180 / Math.PI;
 
@@ -57,5 +57,23 @@ describe('faceRadius', () => {
         expect(Math.hypot(corner.x - face.x, corner.y - face.y)).toBeCloseTo(faceRadius(face));
       }
     }
+  });
+});
+
+describe('HEX_ART_FIT', () => {
+  it('lands the drawn centreline exactly on the cell boundary', () => {
+    const board = hexLattice({ extent: 'hexagon', size: 3, fit: { width: 400, height: 400 } });
+    for (const face of board.faces) {
+      const cell = faceRadius(face);
+      // What the sprite actually draws: the canvas is fitted to the cell, then
+      // the ink sits at CENTRELINE_RATIO of that, then `scale` corrects it.
+      const drawn = cell * HEX_ART_CENTRELINE_RATIO * HEX_ART_FIT;
+      expect(drawn).toBeCloseTo(cell, 6);
+    }
+  });
+
+  it('is a correction upward — the uncorrected fit draws ~2.5% small', () => {
+    expect(HEX_ART_FIT).toBeGreaterThan(1);
+    expect(1 - HEX_ART_CENTRELINE_RATIO).toBeCloseTo(0.0246, 3);
   });
 });

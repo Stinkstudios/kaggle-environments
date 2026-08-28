@@ -1,6 +1,6 @@
 import { latticeStrokes, type Board, type Face, type Vec2 } from '@kaggle-environments/board';
 import { Container, Graphics, Sprite, TilingSprite, type Texture } from 'pixi.js';
-import { faceRadius, hexRotation } from './hex';
+import { faceRadius, HEX_ART_FIT, hexRotation } from './hex';
 import { requireTexture, type TextureMap } from './textures';
 
 /**
@@ -204,16 +204,18 @@ export interface FaceSpritesOptions {
   color?: number;
   alpha?: number;
   /**
-   * Multiplier on the fitted size. The sprite is fitted to the cell's exact
-   * circumradius, but the artwork is cropped tight to the *outside* of a stroke
-   * with real width, which seats the drawn line marginally inside the cell.
-   * Nudge it here rather than by editing the master.
+   * Multiplier on the fitted size. Defaults to {@link HEX_ART_FIT}, which seats
+   * the drawn stroke's *centreline* on the cell boundary so neighbouring
+   * outlines meet rather than leaving a gap -- fitting the raw canvas draws the
+   * hexagon 2.5% small, because the master is cropped to the outside of a stroke
+   * with real width. Pass 1 to see the uncorrected fit. Nudge it here rather
+   * than by editing the master.
    */
   scale?: number;
 }
 
 const FACE_STYLE_ASSETS: Record<FaceStyleName, string> = { 'hex-solid': 'board:hex-solid' };
-const FACE_SPRITE_DEFAULTS = { color: 0xffffff, alpha: 1, scale: 1 };
+const FACE_SPRITE_DEFAULTS = { color: 0xffffff, alpha: 1, scale: HEX_ART_FIT };
 
 /**
  * Draw the design system's hand-drawn cell artwork, one sprite per face.

@@ -172,14 +172,18 @@ Two things to know before using it:
 - **Interior edges are drawn twice**, once by each of the two cells that share
   them, and two hand-drawn strokes do not coincide. That is the cell-by-cell
   look the artwork is going for, but it does weight interior lines more heavily
-  than the boundary. `Hex cell styles → AgainstProgrammatic` puts it beside the
+  than the boundary. How much that actually shows depends entirely on `scale`
+  being right: at the wrong fit the two strokes separate into tram-lines, and at
+  `HEX_ART_FIT` they overlap into one slightly heavier line. Judge it at the
+  correct fit. `Hex cell styles → AgainstProgrammatic` puts it beside the
   `drawFaces` stroke so the call can be made by looking.
-- **`scale` defaults to 1**, which fits the master's bounding box to the cell's.
-  The master is cropped tight to the *outside* of a stroke with real width, so
-  at 1 the drawn line seats marginally inside the cell and neighbouring outlines
-  pull apart rather than overlap — order of 1–2%. `Hex cell styles → Overlap` is
-  a slider over exactly that range; settle the default there rather than by
-  editing the artwork.
+- **`scale` defaults to `HEX_ART_FIT` (≈1.025), not 1.** The master is cropped
+  to the *outside* of a stroke with real width, so fitting the raw canvas to the
+  cell draws the hexagon at 97.5% and leaves a visible gap at every shared edge.
+  The constant is measured off the artwork — the alpha-weighted mean projection
+  onto each of the six edge normals, which agree to within 0.24% — and seats the
+  stroke's centreline on the cell boundary so neighbours meet. Pass `scale: 1`
+  to see the uncorrected fit; `Hex cell styles → Overlap` slides across it.
 
 `hex-dash` is declared in `families.json` but not drawn yet, so it lands in the
 `board` family's `missing[]` and `loadFamilies` warns about it in dev. That is
