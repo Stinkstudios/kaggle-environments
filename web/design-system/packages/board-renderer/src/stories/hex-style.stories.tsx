@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import boardFamily from '@kaggle-environments/design-system-assets/board';
 import { hexLattice, type Board, type HexExtent, type HexOrientation } from '@kaggle-environments/board';
@@ -12,11 +12,9 @@ import { BoardCanvas } from './board-canvas';
  * `latticeStrokes`, and `board:hex-solid` is a closed outline with no run to
  * tile it along. So the cell art is its own function, walking `board.faces`.
  *
- * The comparison worth making here is the seams. Every interior edge belongs to
- * two cells and is therefore drawn twice, once by each neighbour, and two
- * hand-drawn strokes do not coincide. Whether that reads as cell-by-cell
- * character or as muddy interior lines is a decision to make by looking, which
- * is what this story is for.
+ * The seam question these were built to answer is settled: the half asset draws
+ * each shared edge once. What is left here is the comparison that justifies it
+ * and the one live decision, `closeBoundary`.
  */
 const meta = {
   title: 'Board renderer/Hex cell styles',
@@ -74,15 +72,30 @@ function useHexBoard(extent: HexExtent, orientation: HexOrientation, size = 4) {
 }
 
 /**
- * The whole outline against the half. Every interior edge belongs to two cells,
- * so the whole hexagon draws it twice; the half carries three contiguous edges
- * and the three neighbours draw the rest.
+ * The three ways to draw a hex cell, on one board.
+ *
+ * Left is the programmatic fallback. `drawGrid` cannot serve a hex board at all
+ * -- it tiles a strip along the merged runs of `latticeStrokes`, and a closed
+ * outline has no run to tile along -- so before the artwork existed this stroke
+ * was the only option.
+ *
+ * Middle and right are the artwork. Every interior edge belongs to two cells, so
+ * the whole outline draws it twice; the half carries three contiguous edges and
+ * the three neighbours draw the rest, for half the sprites and one stroke per
+ * edge.
  */
-export const WholeVsHalf: StoryObj = {
+export const CellStyles: StoryObj = {
   render: function Render() {
     const board = useHexBoard('hexagon', 'pointy');
     return (
-      <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <HexBoard
+          board={board}
+          draw={(renderer, b) =>
+            renderer.layers.board.addChild(drawFaces(b, { stroke: { color: 0x000000, width: 1.5 } }))
+          }
+          caption="drawFaces — programmatic stroke, no artwork"
+        />
         <HexBoard
           board={board}
           draw={(renderer, b) =>
@@ -97,7 +110,7 @@ export const WholeVsHalf: StoryObj = {
               drawFaceSprites(b, { style: 'hex-half-solid', textures: renderer.textures })
             )
           }
-          caption="hex-half-solid — drawn once, outline closed"
+          caption="hex-half-solid — drawn once (the default for a board)"
         />
       </div>
     );
@@ -127,29 +140,6 @@ export const Boundary: StoryObj = {
             )
           }
           caption="closeBoundary: true (default)"
-        />
-      </div>
-    );
-  },
-};
-
-/** The artwork against the `Graphics` stroke it is meant to replace. */
-export const AgainstProgrammatic: StoryObj = {
-  render: function Render() {
-    const board = useHexBoard('hexagon', 'pointy');
-    return (
-      <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
-        <HexBoard
-          board={board}
-          draw={(renderer, b) =>
-            renderer.layers.board.addChild(drawFaces(b, { stroke: { color: 0x000000, width: 1.5 } }))
-          }
-          caption="drawFaces — programmatic stroke, one line per shared edge"
-        />
-        <HexBoard
-          board={board}
-          draw={(renderer, b) => renderer.layers.board.addChild(drawFaceSprites(b, { style: 'hex-half-solid', textures: renderer.textures }))}
-          caption="drawFaceSprites — board:hex-solid, one sprite per cell"
         />
       </div>
     );
@@ -194,37 +184,6 @@ export const Extents: StoryObj = {
         <HexBoard board={hexagon} draw={draw} caption="hexagon — havannah" />
         <HexBoard board={rhombus} draw={draw} caption="rhombus — dark_hex" />
         <HexBoard board={triangle} draw={draw} caption="triangle — y" />
-      </div>
-    );
-  },
-};
-
-/**
- * The `scale` knob. The master is cropped to the outside of a stroke with real
- * width, so a sprite fitted to the cell's exact circumradius seats its drawn
- * line marginally inside the cell — and neighbouring outlines pull apart rather
- * than overlap. Nudge it here rather than by editing the artwork.
- */
-export const Overlap: StoryObj = {
-  render: function Render() {
-    const board = useHexBoard('hexagon', 'pointy');
-    const [scale, setScale] = useState(1);
-    const draw = useMemo(
-      () => (renderer: BoardRenderer<Layer>, b: Board) =>
-        renderer.layers.board.addChild(drawFaceSprites(b, { style: 'hex-half-solid', textures: renderer.textures, scale })),
-      [scale]
-    );
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <HexBoard board={board} draw={draw} caption={`scale ${scale.toFixed(3)}`} />
-        <input
-          type="range"
-          min={0.94}
-          max={1.06}
-          step={0.002}
-          value={scale}
-          onChange={(event) => setScale(Number(event.target.value))}
-        />
       </div>
     );
   },
