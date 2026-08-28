@@ -18,5 +18,5 @@ export type { HexLatticeOptions, HexOrientation, HexExtent } from './hex';
 export { graphLattice } from './graph';
 export type { GraphLatticeOptions } from './graph';
 
-export { diffOccupancy, occupancyFromGrid } from './diff';
-export type { Occupancy, OccupancyDiff, DiffOptions } from './diff';
+export { diffOccupancy, occupancyFromGrid, occupancyFromList } from './diff';
+export type { Occupancy, Occupant, OccupancyDiff, DiffOptions } from './diff';
