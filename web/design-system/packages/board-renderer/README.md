@@ -151,8 +151,8 @@ Where the lines *are* the cell, the artwork is too. `drawFaceSprites` places one
 sprite per face:
 
 ```ts
-drawFaceSprites(board, { textures });                       // board:hex-solid
-drawFaceSprites(board, { textures, scale: 1.02 });          // grow past the cell's extent
+drawFaceSprites(board, { style: 'hex-half-solid', textures });   // what a board wants
+drawFaceSprites(board, { style: 'hex-solid', textures });        // one cell, drawn whole
 ```
 
 This is a separate function from `drawGrid` rather than another `GridStyleName`,
@@ -167,9 +167,37 @@ it was generated with. A flipped or third-party lattice therefore still gets art
 that lines up. That is the same call the squiggle strip makes by rotating per
 run instead of shipping a vertical copy.
 
+### Halves, and why they are the default for a board
+
+`hex-solid` draws a closed outline per cell. Every interior edge belongs to two
+cells, so it gets drawn twice — 462 of 552 edges on a size-8 Havannah board.
+`hex-half-solid` carries three contiguous edges instead, and the three
+neighbours draw the rest: each shared edge lands exactly once, for half the
+sprites. Verified across every extent, both orientations and a flipped board.
+
+The other half is the same file turned 180 degrees; there is no second asset.
+
+What one half per cell *cannot* cover is an erased edge with no neighbour behind
+it, so half the board's outline goes missing. `closeBoundary` (default true)
+draws the complement on those cells. It re-doubles any of that cell's other
+erased edges that do have a neighbour — 42 of 552 edges, against 462 — and that
+is the price of working in halves rather than single edges. Set it false when
+the game draws its own border off `board.sides`, which every hex game here does.
+
+Two implementation notes, both load-bearing:
+
+- **The atlas must stay untrimmed.** The fit maps the master's *canvas* to the
+  cell, so a trimmed frame would scale and seat the art wrongly — and the half
+  is mostly empty canvas, so it is the first thing to break. `allowTrim: false`
+  in `assetpack.config.mjs` is what holds this up.
+- **`hexRotation` biases its half-step comparison.** A flat-top board lands
+  exactly on the boundary, where floating-point noise otherwise sends some faces
+  to +30 degrees and the rest to −30. Both draw an identical hexagon, so a whole
+  outline never notices; a half does, and a board mixing them tiles wrong.
+
 Two things to know before using it:
 
-- **Interior edges are drawn twice**, once by each of the two cells that share
+- **Interior edges are drawn twice** with `hex-solid`, once by each of the two cells that share
   them, and two hand-drawn strokes do not coincide. That is the cell-by-cell
   look the artwork is going for, but it does weight interior lines more heavily
   than the boundary. How much that actually shows depends entirely on `scale`

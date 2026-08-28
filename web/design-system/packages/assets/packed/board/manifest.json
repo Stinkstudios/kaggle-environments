@@ -12,8 +12,8 @@
     "image": "board.webp",
     "data": "board.webp.json",
     "size": {
-      "w": 436,
-      "h": 358
+      "w": 610,
+      "h": 488
     }
   },
   "pieces": {
@@ -21,14 +21,31 @@
       "id": "board:dark-tile",
       "file": null,
       "frame": {
-        "x": 306,
-        "y": 2,
+        "x": 2,
+        "y": 358,
         "w": 128,
         "h": 128
       },
       "sourceSize": {
         "w": 128,
         "h": 128
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "board:hex-half-solid": {
+      "id": "board:hex-half-solid",
+      "file": null,
+      "frame": {
+        "x": 306,
+        "y": 2,
+        "w": 302,
+        "h": 348
+      },
+      "sourceSize": {
+        "w": 302,
+        "h": 348
       },
       "label": "",
       "decorative": true,
@@ -70,6 +87,7 @@
     }
   },
   "missing": [
-    "board:hex-dash"
+    "board:hex-dash",
+    "board:hex-half-dash"
   ]
 }

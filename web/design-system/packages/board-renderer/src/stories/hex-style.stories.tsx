@@ -73,6 +73,66 @@ function useHexBoard(extent: HexExtent, orientation: HexOrientation, size = 4) {
   );
 }
 
+/**
+ * The whole outline against the half. Every interior edge belongs to two cells,
+ * so the whole hexagon draws it twice; the half carries three contiguous edges
+ * and the three neighbours draw the rest.
+ */
+export const WholeVsHalf: StoryObj = {
+  render: function Render() {
+    const board = useHexBoard('hexagon', 'pointy');
+    return (
+      <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
+        <HexBoard
+          board={board}
+          draw={(renderer, b) =>
+            renderer.layers.board.addChild(drawFaceSprites(b, { style: 'hex-solid', textures: renderer.textures }))
+          }
+          caption="hex-solid — every shared edge drawn twice"
+        />
+        <HexBoard
+          board={board}
+          draw={(renderer, b) =>
+            renderer.layers.board.addChild(
+              drawFaceSprites(b, { style: 'hex-half-solid', textures: renderer.textures })
+            )
+          }
+          caption="hex-half-solid — drawn once, outline closed"
+        />
+      </div>
+    );
+  },
+};
+
+/** With and without the boundary closed, which is the `closeBoundary` call. */
+export const Boundary: StoryObj = {
+  render: function Render() {
+    const board = useHexBoard('hexagon', 'pointy');
+    return (
+      <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start' }}>
+        <HexBoard
+          board={board}
+          draw={(renderer, b) =>
+            renderer.layers.board.addChild(
+              drawFaceSprites(b, { style: 'hex-half-solid', textures: renderer.textures, closeBoundary: false })
+            )
+          }
+          caption="closeBoundary: false — half the outline open"
+        />
+        <HexBoard
+          board={board}
+          draw={(renderer, b) =>
+            renderer.layers.board.addChild(
+              drawFaceSprites(b, { style: 'hex-half-solid', textures: renderer.textures })
+            )
+          }
+          caption="closeBoundary: true (default)"
+        />
+      </div>
+    );
+  },
+};
+
 /** The artwork against the `Graphics` stroke it is meant to replace. */
 export const AgainstProgrammatic: StoryObj = {
   render: function Render() {
@@ -88,7 +148,7 @@ export const AgainstProgrammatic: StoryObj = {
         />
         <HexBoard
           board={board}
-          draw={(renderer, b) => renderer.layers.board.addChild(drawFaceSprites(b, { textures: renderer.textures }))}
+          draw={(renderer, b) => renderer.layers.board.addChild(drawFaceSprites(b, { style: 'hex-half-solid', textures: renderer.textures }))}
           caption="drawFaceSprites — board:hex-solid, one sprite per cell"
         />
       </div>
@@ -106,7 +166,7 @@ export const BothOrientations: StoryObj = {
     const flat = useHexBoard('hexagon', 'flat');
     const draw = useMemo(
       () => (renderer: BoardRenderer<Layer>, b: Board) =>
-        renderer.layers.board.addChild(drawFaceSprites(b, { textures: renderer.textures })),
+        renderer.layers.board.addChild(drawFaceSprites(b, { style: 'hex-half-solid', textures: renderer.textures })),
       []
     );
     return (
@@ -126,7 +186,7 @@ export const Extents: StoryObj = {
     const triangle = useHexBoard('triangle', 'pointy', 6);
     const draw = useMemo(
       () => (renderer: BoardRenderer<Layer>, b: Board) =>
-        renderer.layers.board.addChild(drawFaceSprites(b, { textures: renderer.textures })),
+        renderer.layers.board.addChild(drawFaceSprites(b, { style: 'hex-half-solid', textures: renderer.textures })),
       []
     );
     return (
@@ -151,7 +211,7 @@ export const Overlap: StoryObj = {
     const [scale, setScale] = useState(1);
     const draw = useMemo(
       () => (renderer: BoardRenderer<Layer>, b: Board) =>
-        renderer.layers.board.addChild(drawFaceSprites(b, { textures: renderer.textures, scale })),
+        renderer.layers.board.addChild(drawFaceSprites(b, { style: 'hex-half-solid', textures: renderer.textures, scale })),
       [scale]
     );
     return (

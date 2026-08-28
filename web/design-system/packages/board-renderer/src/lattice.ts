@@ -1,6 +1,6 @@
 import { latticeStrokes, type Board, type Face, type Vec2 } from '@kaggle-environments/board';
 import { Container, Graphics, Sprite, TilingSprite, type Texture } from 'pixi.js';
-import { faceRadius, HEX_ART_FIT, hexRotation } from './hex';
+import { complementFaces, faceRadius, HEX_ART_FIT, hexRotation } from './hex';
 import { requireTexture, type TextureMap } from './textures';
 
 /**
@@ -179,13 +179,17 @@ export function drawFaces(board: Board, options: FacesOptions = {}): Graphics {
  * restyling every hex board in the repo should be a change here, not a change
  * in N renderers.
  *
- * - `hex-solid` -- a hand-drawn hexagon outline, one per cell.
+ * - `hex-solid`      -- a hand-drawn hexagon outline, one per cell.
+ * - `hex-half-solid` -- three contiguous edges of it, so a tiling draws each
+ *   shared edge once rather than twice. Half the sprites, and interior lines
+ *   stop carrying more weight than the boundary. Prefer this for a board;
+ *   `hex-solid` remains right for a cell shown on its own.
  *
- * The `-solid` suffix mirrors `squiggle-dash`: the same hand-drawn set has a
- * dashed hexagon coming, and a bare `hex` would need renaming across every
- * board the day it lands.
+ * The `-solid` suffix mirrors `squiggle-dash`: the same hand-drawn set has
+ * dashed variants coming, and a bare `hex` would need renaming across every
+ * board the day they land.
  */
-export type FaceStyleName = 'hex-solid';
+export type FaceStyleName = 'hex-solid' | 'hex-half-solid';
 
 export interface FaceSpritesOptions {
   /** Defaults to `hex-solid`, the only cell style drawn so far. */
@@ -212,10 +216,30 @@ export interface FaceSpritesOptions {
    * than by editing the master.
    */
   scale?: number;
+  /**
+   * For a half style, also draw the complement -- the same artwork turned 180
+   * degrees -- on cells that have an outside edge, closing the board's outline.
+   * Defaults to true, because an open outline reads as unfinished.
+   *
+   * Set false when the game draws its own border. Every hex game here is a
+   * connection game that already does: `dark_hex` colours n/s and e/w,
+   * `havannah` needs its 6 sides and 6 corners, `y` its 3 -- all of which come
+   * off `board.sides` via {@link drawBorder}. Doubling a boundary the game is
+   * about to draw over is worth avoiding.
+   *
+   * Ignored by whole-outline styles, which have no boundary to close.
+   */
+  closeBoundary?: boolean;
 }
 
-const FACE_STYLE_ASSETS: Record<FaceStyleName, string> = { 'hex-solid': 'board:hex-solid' };
-const FACE_SPRITE_DEFAULTS = { color: 0xffffff, alpha: 1, scale: HEX_ART_FIT };
+const FACE_STYLE_ASSETS: Record<FaceStyleName, string> = {
+  'hex-solid': 'board:hex-solid',
+  'hex-half-solid': 'board:hex-half-solid',
+};
+
+/** Styles that draw a partial outline and so need the boundary closing. */
+const HALF_STYLES: ReadonlySet<FaceStyleName> = new Set<FaceStyleName>(['hex-half-solid']);
+const FACE_SPRITE_DEFAULTS = { color: 0xffffff, alpha: 1, scale: HEX_ART_FIT, closeBoundary: true };
 
 /**
  * Draw the design system's hand-drawn cell artwork, one sprite per face.
@@ -234,7 +258,7 @@ const FACE_SPRITE_DEFAULTS = { color: 0xffffff, alpha: 1, scale: HEX_ART_FIT };
  * can be made by looking.
  */
 export function drawFaceSprites(board: Board, options: FaceSpritesOptions = {}): Container {
-  const { textures, color, alpha, scale } = { ...FACE_SPRITE_DEFAULTS, ...options };
+  const { textures, color, alpha, scale, closeBoundary } = { ...FACE_SPRITE_DEFAULTS, ...options };
   const style = options.style ?? 'hex-solid';
   const assetId = FACE_STYLE_ASSETS[style];
 
@@ -248,8 +272,9 @@ export function drawFaceSprites(board: Board, options: FaceSpritesOptions = {}):
   }
 
   const container = new Container();
+  const complement = HALF_STYLES.has(style) && closeBoundary ? complementFaces(board) : null;
 
-  for (const face of board.faces) {
+  board.faces.forEach((face, index) => {
     // Pointing hex artwork at a square lattice silently draws hexagons over the
     // squares, which survives review as "a style choice". Say what's wrong.
     if (face.corners.length !== 6) {
@@ -269,7 +294,18 @@ export function drawFaceSprites(board: Board, options: FaceSpritesOptions = {}):
     sprite.tint = color;
     sprite.alpha = alpha;
     container.addChild(sprite);
-  }
+
+    if (complement?.has(index)) {
+      const other = new Sprite(texture);
+      other.anchor.set(0.5);
+      other.position.set(face.x, face.y);
+      other.scale.set(sprite.scale.x);
+      other.rotation = sprite.rotation + Math.PI;
+      other.tint = color;
+      other.alpha = alpha;
+      container.addChild(other);
+    }
+  });
 
   return container;
 }

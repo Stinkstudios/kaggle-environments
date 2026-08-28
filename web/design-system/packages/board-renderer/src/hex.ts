@@ -1,4 +1,4 @@
-import type { Face } from '@kaggle-environments/board';
+import type { Board, Face } from '@kaggle-environments/board';
 
 /**
  * The geometry behind the `hex-solid` cell style, kept clear of PixiJS so it can
@@ -56,7 +56,13 @@ export function hexRotation(face: Face): number {
   if (!first) return 0;
   const offset = Math.atan2(first.y - face.y, first.x - face.x) - HEX_ASSET_VERTEX_ANGLE;
   const turn = ((offset % HEX_SYMMETRY) + HEX_SYMMETRY) % HEX_SYMMETRY;
-  return turn > HEX_SYMMETRY / 2 ? turn - HEX_SYMMETRY : turn;
+  // The epsilon is load-bearing. A flat-top board lands *exactly* on the
+  // half-step, where floating-point noise otherwise sends some faces to +30
+  // degrees and the rest to -30. Both draw an identical hexagon -- the shape is
+  // 60-degree symmetric -- so a whole-outline style never notices. A half
+  // outline does: the two turns keep different edges, and a board mixing them
+  // tiles wrong. Biasing the comparison makes the whole board agree.
+  return turn > HEX_SYMMETRY / 2 + 1e-9 ? turn - HEX_SYMMETRY : turn;
 }
 
 /**
@@ -71,4 +77,86 @@ export function faceRadius(face: Face): number {
     radius = Math.max(radius, Math.hypot(corner.x - face.x, corner.y - face.y));
   }
   return radius;
+}
+
+/**
+ * The arc of the `hex-half-solid` master that carries ink, measured in the
+ * master's own frame (before {@link hexRotation} turns it onto a face).
+ *
+ * The half was cut along the line joining the upper-right vertex to the
+ * lower-left one, keeping the left, upper-left and upper-right edges: a
+ * continuous path whose three edge midpoints sit at 180, 240 and 300 degrees.
+ * Anything whose midpoint falls outside 150..330 is on the erased side.
+ */
+const HEX_ART_KEPT_FROM = (150 * Math.PI) / 180;
+const HEX_ART_KEPT_TO = (330 * Math.PI) / 180;
+
+const TAU = Math.PI * 2;
+const norm = (angle: number) => ((angle % TAU) + TAU) % TAU;
+
+/** Midpoint of face edge `i`, which runs `corners[i] -> corners[i + 1]`. */
+export function edgeMidpoint(face: Face, i: number): { x: number; y: number } {
+  const a = face.corners[i];
+  const b = face.corners[(i + 1) % face.corners.length];
+  return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+}
+
+/**
+ * Which of a face's six edges the half artwork actually draws.
+ *
+ * Worked out geometrically -- each edge midpoint is turned back into the
+ * master's frame and tested against the kept arc -- rather than by hardcoding
+ * indices. The indices happen to come out the same for pointy and flat boards,
+ * but that is a consequence of how `hexRotation` aligns the art, not something
+ * to rely on: a flipped or third-party lattice can wind its corners the other
+ * way, and this follows it.
+ */
+export function keptEdges(face: Face): boolean[] {
+  const rotation = hexRotation(face);
+  return face.corners.map((_, i) => {
+    const mid = edgeMidpoint(face, i);
+    const inArt = norm(Math.atan2(mid.y - face.y, mid.x - face.x) - rotation);
+    return inArt >= HEX_ART_KEPT_FROM - 1e-9 && inArt <= HEX_ART_KEPT_TO + 1e-9;
+  });
+}
+
+const pointKey = (p: { x: number; y: number }) => `${p.x.toFixed(4)},${p.y.toFixed(4)}`;
+const edgeKey = (a: { x: number; y: number }, b: { x: number; y: number }) =>
+  [pointKey(a), pointKey(b)].sort().join('|');
+
+/**
+ * Faces that must also draw the complement half, by index into `board.faces`.
+ *
+ * One half per cell covers every *interior* edge exactly once -- each cell's
+ * three erased edges are drawn by the three neighbours that share them. What it
+ * cannot cover is an erased edge with no neighbour behind it, so half the
+ * board's outline goes missing. These are the faces with at least one such edge.
+ *
+ * Drawing the whole complement there re-doubles any of that cell's other erased
+ * edges that *do* have a neighbour. That is the cost of working in halves rather
+ * than single edges, and it is confined to the boundary ring: 42 of 552 edges on
+ * a size-8 Havannah board, against 462 doubled by drawing whole hexagons.
+ */
+export function complementFaces(board: Board): Set<number> {
+  const shared = new Map<string, number>();
+  for (const face of board.faces) {
+    for (let i = 0; i < face.corners.length; i++) {
+      const k = edgeKey(face.corners[i], face.corners[(i + 1) % face.corners.length]);
+      shared.set(k, (shared.get(k) ?? 0) + 1);
+    }
+  }
+
+  const needed = new Set<number>();
+  board.faces.forEach((face, index) => {
+    const kept = keptEdges(face);
+    for (let i = 0; i < face.corners.length; i++) {
+      if (kept[i]) continue;
+      const k = edgeKey(face.corners[i], face.corners[(i + 1) % face.corners.length]);
+      if (shared.get(k) === 1) {
+        needed.add(index);
+        return;
+      }
+    }
+  });
+  return needed;
 }
