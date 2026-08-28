@@ -1,7 +1,7 @@
 {
   "family": "go",
   "version": 1,
-  "description": "Go stones, board furniture and territory overlays",
+  "description": "Go stones, markers and territory overlays",
   "individual": false,
   "targets": [
     "pixi",
@@ -56,7 +56,7 @@
       "file": null,
       "frame": {
         "x": 2,
-        "y": 144,
+        "y": 138,
         "w": 84,
         "h": 84
       },
@@ -66,23 +66,6 @@
       },
       "label": "black territory",
       "decorative": false,
-      "tintable": false
-    },
-    "go:grid-line": {
-      "id": "go:grid-line",
-      "file": null,
-      "frame": {
-        "x": 2,
-        "y": 138,
-        "w": 74,
-        "h": 4
-      },
-      "sourceSize": {
-        "w": 74,
-        "h": 4
-      },
-      "label": "",
-      "decorative": true,
       "tintable": false
     },
     "go:hoshi": {

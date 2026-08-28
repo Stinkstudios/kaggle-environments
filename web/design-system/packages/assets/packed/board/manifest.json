@@ -1,22 +1,19 @@
 {
   "family": "board",
   "version": 1,
-  "description": "Board surface textures",
+  "description": "Board surface textures and hand-drawn board lines",
   "individual": false,
   "targets": [
     "pixi",
     "dom"
   ],
-  "sourceSize": {
-    "w": 128,
-    "h": 128
-  },
+  "sourceSize": null,
   "atlas": {
     "image": "board.webp",
     "data": "board.webp.json",
     "size": {
       "w": 132,
-      "h": 132
+      "h": 138
     }
   },
   "pieces": {
@@ -25,13 +22,30 @@
       "file": null,
       "frame": {
         "x": 2,
-        "y": 2,
+        "y": 8,
         "w": 128,
         "h": 128
       },
       "sourceSize": {
         "w": 128,
         "h": 128
+      },
+      "label": "",
+      "decorative": true,
+      "tintable": false
+    },
+    "board:squiggle-dash": {
+      "id": "board:squiggle-dash",
+      "file": null,
+      "frame": {
+        "x": 2,
+        "y": 2,
+        "w": 74,
+        "h": 4
+      },
+      "sourceSize": {
+        "w": 74,
+        "h": 4
       },
       "label": "",
       "decorative": true,

@@ -8,7 +8,8 @@ import boardAtlasUrl from '../../packed/board/board.webp';
 import boardAtlasData from '../../packed/board/board.webp.json';
 
 export const pieces: Record<string, PieceAsset> = {
-  'board:dark-tile': { id: 'board:dark-tile', family: 'board', url: null, atlasUrl: boardAtlasUrl, atlasSize: {"w":132,"h":132}, frame: {"x":2,"y":2,"w":128,"h":128}, sourceSize: {"w":128,"h":128}, label: "", decorative: true, tintable: false },
+  'board:dark-tile': { id: 'board:dark-tile', family: 'board', url: null, atlasUrl: boardAtlasUrl, atlasSize: {"w":132,"h":138}, frame: {"x":2,"y":8,"w":128,"h":128}, sourceSize: {"w":128,"h":128}, label: "", decorative: true, tintable: false },
+  'board:squiggle-dash': { id: 'board:squiggle-dash', family: 'board', url: null, atlasUrl: boardAtlasUrl, atlasSize: {"w":132,"h":138}, frame: {"x":2,"y":2,"w":74,"h":4}, sourceSize: {"w":74,"h":4}, label: "", decorative: true, tintable: false },
 };
 
 const family: FamilyInfo = {
@@ -16,7 +17,7 @@ const family: FamilyInfo = {
   targets: ["pixi","dom"],
   atlasUrl: boardAtlasUrl,
   atlasData: boardAtlasData,
-  atlasSize: {"w":132,"h":132},
+  atlasSize: {"w":132,"h":138},
   individual: false,
   pieces: Object.values(pieces),
   missing: [],
