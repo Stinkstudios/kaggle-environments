@@ -25,7 +25,8 @@ export interface Dimensions {
  * ```
  *
  * All three get points, edges and faces; they differ only in which they read.
- * `primary` follows the spelling used, so `hitTest` defaults to the right thing.
+ * `primary` follows the spelling used, so border groups resolve against the kind
+ * the board is actually played on.
  */
 export type SquareLatticeOptions = LatticeOptions & ({ cells: Dimensions } | { points: Dimensions });
 

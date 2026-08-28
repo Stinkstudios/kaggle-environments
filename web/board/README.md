@@ -1,6 +1,6 @@
 # `@kaggle-environments/board`
 
-Board geometry for game visualizers: coords ⇄ pixels, fitting, adjacency, hit-testing,
+Board geometry for game visualizers: coords ⇄ pixels, fitting, adjacency,
 and state diffing. **No runtime dependencies** — not React, not Pixi, not the DOM — so
 the PixiJS visualizers (`chess`, `go`) and the Canvas2D ones consume the identical
 `Board` object.
@@ -51,21 +51,6 @@ no DOM.
 `fit.padding` is space reserved *outside* the board, for coordinate labels.
 `fit.minScale` is the floor several renderers already apply as `Math.max(12, …)`; a
 clamped board may overflow its box, which is the existing behaviour.
-
-## Hit-testing
-
-```ts
-board.hitTest(x, y);                        // defaults to board.primary
-board.hitTest(x, y, { kinds: ['edge'] });   // Dots & Boxes plays on edges
-```
-
-Faces use exact containment; points and edges use nearest-within-bound (half a pitch and
-a third of a pitch respectively). Consistent with the forward transform by construction,
-since both read the same laid-out geometry. Every element of a square, Go and hexagon
-board round-trips in the tests.
-
-Currently a linear scan — fine for a click handler on a 361-point board, worth a spatial
-index if it ever runs per-frame.
 
 ## Adjacency
 

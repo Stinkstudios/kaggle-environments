@@ -1,4 +1,4 @@
-// Geometry: coords <-> pixels, board fitting, adjacency, hit-testing. No runtime
+// Geometry: coords <-> pixels, board fitting, adjacency. No runtime
 // dependencies -- not React, not Pixi, not the DOM.
 //
 // The canvas host (creation scoped to a parent, devicePixelRatio scaling,

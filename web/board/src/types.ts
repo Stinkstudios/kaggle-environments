@@ -134,19 +134,6 @@ export interface BorderGroup {
   segments: ReadonlyArray<readonly [Vec2, Vec2]>;
 }
 
-export interface Hit {
-  readonly element: Element;
-  /** 0 when the pixel is inside a face; otherwise distance to the element. */
-  readonly distance: number;
-}
-
-export interface HitTestOptions {
-  /** Defaults to `[board.primary]` -- the kind the board was generated for. */
-  kinds?: readonly ElementKind[];
-  /** Defaults to half of {@link Board.pitch} for points, a third for edges. */
-  maxDistance?: number;
-}
-
 export interface Board {
   readonly points: readonly Point[];
   readonly edges: readonly Edge[];
@@ -155,7 +142,7 @@ export interface Board {
   /**
    * The element kind this board was generated for: `'point'` for a Go-style
    * lattice or an irregular graph, `'face'` for a Chess- or hex-style one.
-   * Drives the default of {@link Board.hitTest}.
+   * Border groups resolve against it.
    */
   readonly primary: ElementKind;
 
@@ -190,13 +177,4 @@ export interface Board {
    * is 361x684 iterations if this is recomputed per call.
    */
   neighborsOf(element: Point | Face): readonly (Point | Face)[];
-
-  /**
-   * Pixel -> element. Faces use exact containment; points and edges use nearest
-   * within a distance bound.
-   *
-   * Stays consistent with the forward transform by construction, since both read
-   * the same laid-out geometry.
-   */
-  hitTest(x: number, y: number, options?: HitTestOptions): Hit | null;
 }

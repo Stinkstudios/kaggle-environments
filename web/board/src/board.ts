@@ -1,18 +1,4 @@
-import type {
-  Board,
-  BorderGroup,
-  Coord,
-  Edge,
-  Element,
-  ElementKind,
-  Face,
-  Fit,
-  Flip,
-  Hit,
-  HitTestOptions,
-  Point,
-  Vec2,
-} from './types';
+import type { Board, BorderGroup, Coord, Edge, Element, ElementKind, Face, Fit, Flip, Point, Vec2 } from './types';
 import { coordKey } from './types';
 
 /**
@@ -129,32 +115,11 @@ function median(values: number[]): number {
   return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
 }
 
-function distanceToSegment(px: number, py: number, ax: number, ay: number, bx: number, by: number): number {
-  const dx = bx - ax;
-  const dy = by - ay;
-  const lengthSquared = dx * dx + dy * dy;
-  if (lengthSquared === 0) return Math.hypot(px - ax, py - ay);
-  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lengthSquared));
-  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
-}
-
-/** Ray casting. Points exactly on a shared side may resolve to either face. */
-function isInsidePolygon(px: number, py: number, corners: readonly Vec2[]): boolean {
-  let inside = false;
-  for (let i = 0, j = corners.length - 1; i < corners.length; j = i++) {
-    const { x: xi, y: yi } = corners[i];
-    const { x: xj, y: yj } = corners[j];
-    const intersects = yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi;
-    if (intersects) inside = !inside;
-  }
-  return inside;
-}
-
 /**
  * Lay a unit-space lattice out into final coordinates.
  *
- * Every generator funnels through here, so fitting, flipping, adjacency and
- * hit-testing are written once rather than per topology.
+ * Every generator funnels through here, so fitting, flipping and adjacency are
+ * written once rather than per topology.
  */
 export function createBoard(unit: UnitLattice, options: CreateBoardOptions = {}): Board {
   const { fit, flip } = options;
@@ -406,40 +371,5 @@ export function createBoard(unit: UnitLattice, options: CreateBoardOptions = {})
     faceAt: (coord: Coord) => facesByCoord.get(coordKey(coord)) ?? null,
 
     neighborsOf: (element) => (neighbors.get(element.id) ?? []) as readonly (Point | Face)[],
-
-    hitTest(x: number, y: number, hitOptions: HitTestOptions = {}): Hit | null {
-      const kinds = hitOptions.kinds ?? [unit.primary];
-
-      for (const kind of kinds) {
-        if (kind === 'face') {
-          const found = faces.find((face) => isInsidePolygon(x, y, face.corners));
-          if (found) return { element: found, distance: 0 };
-          continue;
-        }
-
-        const candidates: Element[] = kind === 'point' ? points : edges;
-        const limit = hitOptions.maxDistance ?? (kind === 'point' ? pitch / 2 : pitch / 3);
-        let best: Hit | null = null;
-        for (const candidate of candidates) {
-          const distance =
-            kind === 'point'
-              ? Math.hypot(x - candidate.x, y - candidate.y)
-              : distanceToSegment(
-                  x,
-                  y,
-                  (candidate as Edge).a.x,
-                  (candidate as Edge).a.y,
-                  (candidate as Edge).b.x,
-                  (candidate as Edge).b.y
-                );
-          if (distance <= limit && (best === null || distance < best.distance)) {
-            best = { element: candidate, distance };
-          }
-        }
-        if (best) return best;
-      }
-
-      return null;
-    },
   };
 }
