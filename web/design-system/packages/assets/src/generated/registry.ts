@@ -11,6 +11,7 @@ import fx from './fx';
 import chess_fx from './chess-fx';
 import go from './go';
 import card from './card';
+import card_four_color from './card-four-color';
 
 export interface FamilyRecord {
   atlasUrl: string | null;
@@ -21,7 +22,7 @@ export interface FamilyRecord {
   missing: string[];
 }
 
-const ALL: FamilyInfo[] = [chess, board, fx, chess_fx, go, card];
+const ALL: FamilyInfo[] = [chess, board, fx, chess_fx, go, card, card_four_color];
 
 export const REGISTRY: Record<string, PieceAsset> = Object.fromEntries(
   ALL.flatMap((f) => f.pieces.map((p) => [p.id, p]))

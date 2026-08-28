@@ -22,6 +22,13 @@ export type PieceSize = keyof typeof SIZES;
 export interface PieceProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> {
   /** Stable asset id, e.g. `chess:w-king`, `card:a-spade`, `fx:puff1`. */
   id: string;
+  /**
+   * A variant family to resolve against first, falling back to `id`'s own
+   * family per piece — `prefer="card-four-color"` renders a four-colour deck
+   * without the caller tracking which suits that family actually overrides.
+   * Fixed per game, not a live setting.
+   */
+  prefer?: string;
   size?: PieceSize;
   /** Rendered when no artwork exists. A fallback is a declared gap, never a substitute piece. */
   fallback?: React.ReactNode;
@@ -49,8 +56,8 @@ export interface PieceProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 
  * yet. It lands with the first one (discs/stones); see skills/assets.md.
  */
 export const Piece = React.forwardRef<HTMLSpanElement, PieceProps>(
-  ({ id, size = 'full', fallback = null, label, className, style, ...props }, ref) => {
-    const asset = pieceAsset(id);
+  ({ id, prefer, size = 'full', fallback = null, label, className, style, ...props }, ref) => {
+    const asset = pieceAsset(id, { prefer });
 
     if (!asset) {
       if (import.meta.env?.DEV) {

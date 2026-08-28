@@ -1,0 +1,329 @@
+{
+  "family": "card-four-color",
+  "version": 1,
+  "description": "Four-colour deck. Only the suits that differ from `card`: 13 diamonds + 13 clubs.",
+  "individual": true,
+  "targets": [
+    "dom"
+  ],
+  "sourceSize": {
+    "w": 462,
+    "h": 643
+  },
+  "atlas": null,
+  "pieces": {
+    "card-four-color:10-club": {
+      "id": "card-four-color:10-club",
+      "file": "10-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "10 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:10-diamond": {
+      "id": "card-four-color:10-diamond",
+      "file": "10-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "10 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:2-club": {
+      "id": "card-four-color:2-club",
+      "file": "2-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "2 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:2-diamond": {
+      "id": "card-four-color:2-diamond",
+      "file": "2-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "2 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:3-club": {
+      "id": "card-four-color:3-club",
+      "file": "3-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "3 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:3-diamond": {
+      "id": "card-four-color:3-diamond",
+      "file": "3-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "3 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:4-club": {
+      "id": "card-four-color:4-club",
+      "file": "4-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "4 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:4-diamond": {
+      "id": "card-four-color:4-diamond",
+      "file": "4-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "4 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:5-club": {
+      "id": "card-four-color:5-club",
+      "file": "5-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "5 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:5-diamond": {
+      "id": "card-four-color:5-diamond",
+      "file": "5-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "5 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:6-club": {
+      "id": "card-four-color:6-club",
+      "file": "6-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "6 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:6-diamond": {
+      "id": "card-four-color:6-diamond",
+      "file": "6-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "6 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:7-club": {
+      "id": "card-four-color:7-club",
+      "file": "7-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "7 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:7-diamond": {
+      "id": "card-four-color:7-diamond",
+      "file": "7-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "7 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:8-club": {
+      "id": "card-four-color:8-club",
+      "file": "8-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "8 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:8-diamond": {
+      "id": "card-four-color:8-diamond",
+      "file": "8-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "8 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:9-club": {
+      "id": "card-four-color:9-club",
+      "file": "9-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "9 of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:9-diamond": {
+      "id": "card-four-color:9-diamond",
+      "file": "9-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "9 of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:a-club": {
+      "id": "card-four-color:a-club",
+      "file": "a-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "ace of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:a-diamond": {
+      "id": "card-four-color:a-diamond",
+      "file": "a-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "ace of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:j-club": {
+      "id": "card-four-color:j-club",
+      "file": "j-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "jack of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:j-diamond": {
+      "id": "card-four-color:j-diamond",
+      "file": "j-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "jack of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:k-club": {
+      "id": "card-four-color:k-club",
+      "file": "k-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "king of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:k-diamond": {
+      "id": "card-four-color:k-diamond",
+      "file": "k-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "king of diamonds",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:q-club": {
+      "id": "card-four-color:q-club",
+      "file": "q-club.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "queen of clubs",
+      "decorative": false,
+      "tintable": false
+    },
+    "card-four-color:q-diamond": {
+      "id": "card-four-color:q-diamond",
+      "file": "q-diamond.webp",
+      "frame": null,
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "label": "queen of diamonds",
+      "decorative": false,
+      "tintable": false
+    }
+  },
+  "missing": []
+}

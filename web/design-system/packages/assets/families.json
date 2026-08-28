@@ -346,6 +346,98 @@
         }
       },
       "targets": ["dom"]
+    },
+    "card-four-color": {
+      "description": "Four-colour deck. Only the suits that differ from `card`: 13 diamonds + 13 clubs.",
+      "sourceSize": {
+        "w": 462,
+        "h": 643
+      },
+      "tintable": false,
+      "individual": true,
+      "atlas": false,
+      "$note": "Partial roster by design \u2014 the four-colour deck only differs from `card` in the two suits that change (diamonds blue, clubs green). Spades, hearts, the back and the joker are byte-identical to `card`, so they are deliberately absent here rather than duplicated: a consumer resolves `card-four-color:<piece>` first and falls back to `card:<piece>`. Neutrals (#f1f1f1 face, #000000 ink, #dcdcdb fill) match `card` exactly so the two decks intercut in one hand.",
+      "pieces": {
+        "a-diamond": {
+          "label": "ace of diamonds"
+        },
+        "2-diamond": {
+          "label": "2 of diamonds"
+        },
+        "3-diamond": {
+          "label": "3 of diamonds"
+        },
+        "4-diamond": {
+          "label": "4 of diamonds"
+        },
+        "5-diamond": {
+          "label": "5 of diamonds"
+        },
+        "6-diamond": {
+          "label": "6 of diamonds"
+        },
+        "7-diamond": {
+          "label": "7 of diamonds"
+        },
+        "8-diamond": {
+          "label": "8 of diamonds"
+        },
+        "9-diamond": {
+          "label": "9 of diamonds"
+        },
+        "10-diamond": {
+          "label": "10 of diamonds"
+        },
+        "j-diamond": {
+          "label": "jack of diamonds"
+        },
+        "q-diamond": {
+          "label": "queen of diamonds"
+        },
+        "k-diamond": {
+          "label": "king of diamonds"
+        },
+        "a-club": {
+          "label": "ace of clubs"
+        },
+        "2-club": {
+          "label": "2 of clubs"
+        },
+        "3-club": {
+          "label": "3 of clubs"
+        },
+        "4-club": {
+          "label": "4 of clubs"
+        },
+        "5-club": {
+          "label": "5 of clubs"
+        },
+        "6-club": {
+          "label": "6 of clubs"
+        },
+        "7-club": {
+          "label": "7 of clubs"
+        },
+        "8-club": {
+          "label": "8 of clubs"
+        },
+        "9-club": {
+          "label": "9 of clubs"
+        },
+        "10-club": {
+          "label": "10 of clubs"
+        },
+        "j-club": {
+          "label": "jack of clubs"
+        },
+        "q-club": {
+          "label": "queen of clubs"
+        },
+        "k-club": {
+          "label": "king of clubs"
+        }
+      },
+      "targets": ["dom"]
     }
   }
 }
